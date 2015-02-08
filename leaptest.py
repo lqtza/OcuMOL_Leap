@@ -54,7 +54,6 @@ class PymolListener(Leap.Listener):
         frame = controller.frame()
         #print self.view_do_rotation
 
-
         # Two hands and open hand on the leftmost should allow for rotation
         if len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius > 75:
             self.view_do_rotation = True
@@ -78,7 +77,7 @@ class PymolListener(Leap.Listener):
         if len(frame.hands) == 2:
             for gest in frame.gestures():
                 if gest.type is Leap.Gesture.TYPE_SWIPE:
-                    if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds():
+                    if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds > 0.5:
                         if self.mode == 'view':
                             self.mode = 'edit'
                         else:
