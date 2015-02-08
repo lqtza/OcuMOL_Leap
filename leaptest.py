@@ -16,18 +16,18 @@ class PymolListener(Leap.Listener):
         super(PymolListener, self).__init__(*args, **kwargs)
  
         self.prev_frame = None
-        self.do_rotation = False
-	self.do_translation = False
+        self.view_do_rotation = False
+        self.view_do_translation = False
+        self.mode = 'view' #this should be binary edit or view
  
         self.controller = Leap.Controller()
         self.controller.add_listener(self)
 	#self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
 
-	self.circom=1
-
-	self.rft=PyRift()
-	self.prevrf = [0,0,0]
-	self.currf = [0,0,0]
+        self.circom=1
+        self.rft=PyRift()
+        self.prevrf = [0,0,0]
+        self.currf = [0,0,0]
  
     def __del__(self):
         self.controller.remove_listener(self)
@@ -42,6 +42,7 @@ class PymolListener(Leap.Listener):
         
         # Enable gestures
         self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
+        self.controller.eneable_gesture(Leap.Gesture.TYPE_SWIPE)
 
     def on_disconnect(self, controller):
         print "Disconnected"
@@ -51,21 +52,32 @@ class PymolListener(Leap.Listener):
 
     def on_frame(self, controller):
         frame = controller.frame()
-        #print self.do_rotation
+        #print self.view_do_rotation
+
+        #check what mode to set, also make directional in future
+        if len(frame.hands) == 2:
+            for gest in frame.gestures():
+                if gest.type is Leap.Gesture.TYPE_SWIPE:
+                    if Leap.SwipeGesture(gest).direction.y > 0.5:
+                        if self.mode = 'view':
+                            self.mode = 'edit'
+                        else:
+                            self.mode = 'view'
+                        print self.mode
 
         # Two hands and open hand on the leftmost should allow for rotation
         if len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius > 75:
-            self.do_rotation = True
+            self.view_do_rotation = True
 
         # Two hands and closed hand on the leftmost should allow for translation
         elif len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius < 40:
-            self.do_translation = True
+            self.view_do_translation = True
 
     	else:
-	    self.do_rotation = False
-	    self.do_translation = False
+	    self.view_do_rotation = False
+	    self.view_do_translation = False
  
-        self.update_view(frame,self.do_rotation)
+        self.update_view(frame,self.view_do_rotation)
         self.prev_frame = frame
  
     def update_view(self, frame, do_rotation):
@@ -77,13 +89,14 @@ class PymolListener(Leap.Listener):
 	    print "point"'''
 
         for gest in frame.gestures():
-	    if gest.type is Leap.Gesture.TYPE_CIRCLE:
-		 circle=Leap.CircleGesture(gest)
-		 if math.floor(circle.progress)>=1 and len(frame.hands)==1:
-			 self.circom=0
-	if self.circom==0 and len(frame.gestures())==0:
-	    self.circom=1
-	    cmd.center("all")
+            if gest.type is Leap.Gesture.TYPE_CIRCLE:
+                circle=Leap.CircleGesture(gest)
+                if math.floor(circle.progress)>=1 and len(frame.hands)==1:
+                    self.circom=0
+
+        if self.circom==0 and len(frame.gestures())==0:
+            self.circom=1
+            cmd.center("all")
  
         if frame.hands.rightmost.rotation_probability(self.prev_frame) > 0.1 and do_rotation == True:
             #print 'rotating'
