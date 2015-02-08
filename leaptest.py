@@ -42,7 +42,7 @@ class PymolListener(Leap.Listener):
         
         # Enable gestures
         self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
-        self.controller.eneable_gesture(Leap.Gesture.TYPE_SWIPE)
+        self.controller.enable_gesture(Leap.Gesture.TYPE_SWIPE)
 
     def on_disconnect(self, controller):
         print "Disconnected"
@@ -59,7 +59,7 @@ class PymolListener(Leap.Listener):
             for gest in frame.gestures():
                 if gest.type is Leap.Gesture.TYPE_SWIPE:
                     if Leap.SwipeGesture(gest).direction.y > 0.5:
-                        if self.mode = 'view':
+                        if self.mode == 'view':
                             self.mode = 'edit'
                         else:
                             self.mode = 'view'
@@ -77,10 +77,10 @@ class PymolListener(Leap.Listener):
 	    self.view_do_rotation = False
 	    self.view_do_translation = False
  
-        self.update_view(frame,self.view_do_rotation)
+        self.update_view(frame,self.view_do_rotation, self.view_do_translation)
         self.prev_frame = frame
  
-    def update_view(self, frame, do_rotation):
+    def update_view(self, frame, do_rotation, do_translation):
         if not self.prev_frame:
             return
  
@@ -114,7 +114,7 @@ class PymolListener(Leap.Listener):
             #            Vector(*view[6:9]))
             #view[:9] = m.to_array_3x3()
 
-        elif frame.hands.rightmost.translation_probability(self.prev_frame) > 0.1 and self.do_translation == True:
+        elif frame.hands.rightmost.translation_probability(self.prev_frame) > 0.1 and do_translation == True:
             translation = frame.hands.rightmost.translation(self.prev_frame)
             #print translation.to_float_array()
             cmd.translate(translation.to_float_array())
