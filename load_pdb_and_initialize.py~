@@ -16,7 +16,7 @@ def set_stage(pdb_id):
     util.cbc()
 
     #move slab away to give a comfortable viewing area
-    cmd.clip('move',10)
+    cmd.clip('move',100)
 
     #set stereo mode
     cmd.set('stereo_mode',3)
