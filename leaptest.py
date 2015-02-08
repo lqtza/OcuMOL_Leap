@@ -77,7 +77,7 @@ class PymolListener(Leap.Listener):
         if len(frame.hands) == 2:
             for gest in frame.gestures():
                 if gest.type is Leap.Gesture.TYPE_SWIPE:
-                    if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds > 0.5:
+                    if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds > 0.15:
                         if self.mode == 'view':
                             self.mode = 'edit'
                         else:
