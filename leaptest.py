@@ -9,7 +9,7 @@ sys.path.append("/Users/mariusz/code/LeapSDK/lib")
 #sys.path.append("/Users/lqtza/Downloads/LeapDeveloperKit/LeapSDK/lib")
  
 import Leap
-from Leap import Matrix, Vector, SwipeGesture
+from Leap import Matrix, Vector, CircleGesture
  
 class PymolListener(Leap.Listener):
     def __init__(self, *args, **kwargs):
@@ -21,6 +21,10 @@ class PymolListener(Leap.Listener):
  
         self.controller = Leap.Controller()
         self.controller.add_listener(self)
+	#self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
+
+	self.circom=1
+
 	self.rft=PyRift()
 	self.prevrf = [0,0,0]
 	self.currf = [0,0,0]
@@ -37,12 +41,7 @@ class PymolListener(Leap.Listener):
         print "Connected"
         
         # Enable gestures
-        self.controller.enable_gesture(Leap.Gesture.TYPE_SWIPE)
-
-        # Configure gestures
-        self.controller.config.set("Gesture.Swipe.MinLenght",10.0)
-        self.controller.config.set("Gesture.Swipe.MinVelocity",200)
-        self.controller.config.save()
+        self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
 
     def on_disconnect(self, controller):
         print "Disconnected"
@@ -78,15 +77,14 @@ class PymolListener(Leap.Listener):
 	'''if len(frame.gestures())>=1:
 	    print "point"'''
 
-        #for gest in frame.gestures():
-	        #if gest.type is Leap.Gesture.TYPE_SWIPE:
-		    #swipe=Leap.SwipeGesture(gest)
-		    #start = swipe.start_position
-		    #end= swipe.position
-		    #mag=math.sqrt((start.x-end.x)**2+(start.y-end.y)**2+(start.z-end.z)**2)
-		    #cmd.turn('x',mag/100)
-		    #dire=swipe.direction
-		    #cmd.rotate([dire.y,dire.x,dire.z],mag/50)
+        for gest in frame.gestures():
+	    if gest.type is Leap.Gesture.TYPE_CIRCLE:
+		 circle=Leap.CircleGesture(gest)
+		 if math.floor(circle.progress)>=1 and len(frame.hands)==1:
+			 self.circom=0
+	if self.circom==0 and len(frame.gestures())==0:
+	    self.circom=1
+	    cmd.center("all")
  
         if frame.hands.rightmost.rotation_probability(self.prev_frame) > 0.1 and do_rotation == True:
             #print 'rotating'
