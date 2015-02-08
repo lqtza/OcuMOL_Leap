@@ -17,6 +17,7 @@ class PymolListener(Leap.Listener):
  
         self.prev_frame = None
         self.do_rotation = False
+	self.do_translation = False
  
         self.controller = Leap.Controller()
         self.controller.add_listener(self)
@@ -59,7 +60,11 @@ class PymolListener(Leap.Listener):
 
         # Two hands and closed hand on the leftmost should allow for translation
         elif len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius < 40:
-            self.do_rotation = False
+            self.do_translation = True
+
+    	else:
+	    self.do_rotation = False
+	    self.do_translation = False
  
         self.update_view(frame,self.do_rotation)
         self.prev_frame = frame
@@ -99,11 +104,11 @@ class PymolListener(Leap.Listener):
             #            Vector(*view[6:9]))
             #view[:9] = m.to_array_3x3()
 
-        elif frame.hands.rightmost.translation_probability(self.prev_frame) > 0.1 and do_rotation == False:
+        elif frame.hands.rightmost.translation_probability(self.prev_frame) > 0.1 and self.do_translation == True:
             translation = frame.hands.rightmost.translation(self.prev_frame)
             #print translation.to_float_array()
             cmd.translate(translation.to_float_array())
- 
+
         '''if frame.scale_probability(self.prev_frame) > 0.1:
             s = frame.scale_factor(self.prev_frame)
             delta_z = math.log(s) * 100.0
