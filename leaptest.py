@@ -77,7 +77,7 @@ class PymolListener(Leap.Listener):
 	    self.view_do_rotation = False
 	    self.view_do_translation = False
  
-        self.update_view(frame,self.view_do_rotation)
+        self.update_view(frame, self.view_do_rotation)
         self.prev_frame = frame
  
     def update_view(self, frame, do_rotation):
