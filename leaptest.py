@@ -44,8 +44,8 @@ class PymolListener(Leap.Listener):
         # Enable gestures
         self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
         self.controller.enable_gesture(Leap.Gesture.TYPE_SWIPE)
-	self.controller.config.set("Gesture.Swipe.MinVelocity",500)
-	self.controller.config.save()
+        self.controller.config.set("Gesture.Swipe.MinVelocity",500)
+        self.controller.config.save()
 
     def on_disconnect(self, controller):
         print "Disconnected"
@@ -56,19 +56,20 @@ class PymolListener(Leap.Listener):
     def on_frame(self, controller):
         frame = controller.frame()
         #print self.view_do_rotation
+        
+        if self.mode == 'view':
+            # Two hands and open hand on the leftmost should allow for rotation
+            if len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius > 75:
+                self.view_do_rotation = True
 
-        # Two hands and open hand on the leftmost should allow for rotation
-        if len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius > 75:
-            self.view_do_rotation = True
+            # Two hands and closed hand on the leftmost should allow for translation
+            elif len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius < 40:
+                self.view_do_translation = True
 
-        # Two hands and closed hand on the leftmost should allow for translation
-        elif len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius < 40:
-            self.view_do_translation = True
-
-    	else:
-	    self.view_do_rotation = False
-	    self.view_do_translation = False
- 
+    	    else:
+	        self.view_do_rotation = False
+	        self.view_do_translation = False
+        
         self.update_view(frame,self.view_do_rotation, self.view_do_translation)
         self.prev_frame = frame
  
@@ -135,7 +136,14 @@ class PymolListener(Leap.Listener):
             view[16] -= delta_z
 	    cmd.set_view(view)'''
  
-        #cmd.set_view(view)
+        elif self.mode == 'edit' and len(frame.hands) == 1:
+            if frame.hands[0].is_right:
+                translation = frame.hands[0].translation(self.prev_frame)
+                cmd.translate(translation.to_float_array(),'chain A')
+            elif frame.hands[0].is_left:
+                translation = frame.hands[0].translation(self.prev_frame)
+                cmd.translate(translation.to_float_array(),'chain B')
+
 
 	#Rift support
 	self.rft.poll()
