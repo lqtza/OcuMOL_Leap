@@ -1,6 +1,9 @@
 import sys
 import math
 from pymol import cmd
+from rift import PyRift
+
+import transformations as tran
  
 sys.path.append("/Users/mariusz/code/LeapSDK/lib")
 #sys.path.append("/Users/lqtza/Downloads/LeapDeveloperKit/LeapSDK/lib")
@@ -17,6 +20,9 @@ class PymolListener(Leap.Listener):
  
         self.controller = Leap.Controller()
         self.controller.add_listener(self)
+	self.rft=PyRift()
+	self.prevrf = [0,0,0]
+	self.currf = [0,0,0]
  
     def __del__(self):
         self.controller.remove_listener(self)
@@ -106,6 +112,19 @@ class PymolListener(Leap.Listener):
             view[16] -= delta_z'''
  
         #cmd.set_view(view)
+
+	#Rift support
+	self.rft.poll()
+	self.currf = self.rft.rotation
+	self.currf = tran.euler_from_quaternion([self.currf[3],self.currf[0],self.currf[1],self.currf[2]])
+
+	diff = [self.currf[0]-self.prevrf[0],self.currf[1]-self.prevrf[1],self.currf[2]-self.prevrf[2]]
+
+	cmd.turn('x',diff[0]*100)
+	cmd.turn('y',diff[1]*100)
+	cmd.turn('z',diff[2]*100)
+
+	self.prevrf = self.currf
  
 listener = PymolListener()
 
