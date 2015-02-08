@@ -80,12 +80,14 @@ class PymolListener(Leap.Listener):
         if len(frame.hands) == 2:
             for gest in frame.gestures():
                 if gest.type is Leap.Gesture.TYPE_SWIPE:
-                    if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds > 0.2:
-                        time.sleep(0.6)
+                    if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds > 0.15:
+                        time.sleep(0.3)
                         if self.mode == 'view':
                             self.mode = 'edit'
+			    cmd.bg_color("white")
                         else:
                             self.mode = 'view'
+			    cmd.bg_color("black")
                         do_rotation = False
                         do_translation = False
                         print 'Changing mode to: ' + self.mode
@@ -98,12 +100,15 @@ class PymolListener(Leap.Listener):
         for gest in frame.gestures():
             if gest.type is Leap.Gesture.TYPE_CIRCLE:
                 circle=Leap.CircleGesture(gest)
-                if math.floor(circle.progress)>=1 and len(frame.hands)==1:
+		if math.floor(circle.progress)>=1:# and len(frame.hands)==1:
                     self.circom=0
 
         if self.circom==0 and len(frame.gestures())==0:
             self.circom=1
-            cmd.center("all")
+	    if len(frame.hands)==1:
+            	cmd.center("all")
+	    elif len(frame.hands)==2:
+		cmd.orient("all")
  
         if frame.hands.rightmost.rotation_probability(self.prev_frame) > 0.1 and do_rotation == True:
             #print 'rotating'
