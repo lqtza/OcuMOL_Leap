@@ -82,9 +82,10 @@ class PymolListener(Leap.Listener):
             rotation_about_x = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.x_axis)
             rotation_about_y = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.y_axis)
             rotation_about_z = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.z_axis)
-            cmd.rotate('x',math.degrees(rotation_about_x))
-            cmd.rotate('y',math.degrees(rotation_about_y))
-            cmd.rotate('z',math.degrees(rotation_about_z))
+	    #print rotation_about_x, rotation_about_y, rotation_about_z
+            cmd.rotate('x',rotation_about_x*100)
+            cmd.rotate('y',rotation_about_y*100)
+            cmd.rotate('z',rotation_about_z*100)
             #m = frame.hands.rightmost.rotation_matrix(self.prev_frame)
             #print m
             #m *= Matrix(Vector(*view[0:3]),
@@ -104,11 +105,7 @@ class PymolListener(Leap.Listener):
             view[15] -= delta_z
             view[16] -= delta_z'''
  
-            cmd.set_view(view)
+        #cmd.set_view(view)
  
 listener = PymolListener()
 
-try:
-    sys.stdin.readline()
-except KeyboardInterrupt:
-    pass
