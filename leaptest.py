@@ -1,6 +1,6 @@
 import sys
 import math
-import sleep
+import time
 from pymol import cmd
 from rift import PyRift
 
@@ -44,6 +44,8 @@ class PymolListener(Leap.Listener):
         # Enable gestures
         self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
         self.controller.enable_gesture(Leap.Gesture.TYPE_SWIPE)
+	self.controller.config.set("Gesture.Swipe.MinVelocity",500)
+	self.controller.config.save()
 
     def on_disconnect(self, controller):
         print "Disconnected"
@@ -78,13 +80,16 @@ class PymolListener(Leap.Listener):
         if len(frame.hands) == 2:
             for gest in frame.gestures():
                 if gest.type is Leap.Gesture.TYPE_SWIPE:
-                    if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds > 0.15:
+                    if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds > 0.2:
+                        time.sleep(0.6)
                         if self.mode == 'view':
                             self.mode = 'edit'
                         else:
                             self.mode = 'view'
+			do_rotation = False
+			do_translation = False
                         print 'Changing mode to: ' + self.mode
-                        time.sleep(0.6)
+			break
 
 	'''if len(frame.gestures())>=1:
 	    print "point"'''
