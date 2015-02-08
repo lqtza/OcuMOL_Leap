@@ -1,9 +1,9 @@
 import sys
 import math
-#from pymol import cmd
+from pymol import cmd
  
-#sys.path.append("/Users/mariusz/code/LeapSDK/lib")
-sys.path.append("/Users/lqtza/Downloads/LeapDeveloperKit/LeapSDK/lib")
+sys.path.append("/Users/mariusz/code/LeapSDK/lib")
+#sys.path.append("/Users/lqtza/Downloads/LeapDeveloperKit/LeapSDK/lib")
  
 import Leap
 from Leap import Matrix, Vector, SwipeGesture
@@ -45,7 +45,7 @@ class PymolListener(Leap.Listener):
 
     def on_frame(self, controller):
         frame = controller.frame()
-        print self.do_rotation
+        #print self.do_rotation
 
         # Two hands and open hand on the leftmost should allow for rotation
         if len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius > 75:
@@ -78,6 +78,7 @@ class PymolListener(Leap.Listener):
 		    #cmd.rotate([dire.y,dire.x,dire.z],mag/50)
  
         if frame.hands.rightmost.rotation_probability(self.prev_frame) > 0.1 and do_rotation == True:
+            #print 'rotating'
             rotation_about_x = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.x_axis)
             rotation_about_y = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.y_axis)
             rotation_about_z = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.z_axis)
@@ -90,6 +91,11 @@ class PymolListener(Leap.Listener):
             #            Vector(*view[3:6]),
             #            Vector(*view[6:9]))
             #view[:9] = m.to_array_3x3()
+
+        elif frame.hands.rightmost.translation_probability(self.prev_frame) > 0.1 and do_rotation == False:
+            translation = frame.hands.rightmost.translation(self.prev_frame)
+            #print translation.to_float_array()
+            cmd.translate(translation.to_float_array())
  
         '''if frame.scale_probability(self.prev_frame) > 0.1:
             s = frame.scale_factor(self.prev_frame)
@@ -98,7 +104,7 @@ class PymolListener(Leap.Listener):
             view[15] -= delta_z
             view[16] -= delta_z'''
  
-#        cmd.set_view(view)
+            cmd.set_view(view)
  
 listener = PymolListener()
 
