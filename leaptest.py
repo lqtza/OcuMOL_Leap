@@ -1,5 +1,6 @@
 import sys
 import math
+import sleep
 from pymol import cmd
 from rift import PyRift
 
@@ -82,7 +83,8 @@ class PymolListener(Leap.Listener):
                             self.mode = 'edit'
                         else:
                             self.mode = 'view'
-                        print self.mode
+                        print 'Changing mode to: ' + self.mode
+                        time.sleep(0.6)
 
 	'''if len(frame.gestures())>=1:
 	    print "point"'''
