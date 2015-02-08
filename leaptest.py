@@ -72,7 +72,6 @@ class PymolListener(Leap.Listener):
         if not self.prev_frame:
             return
  
-        #view = list(cmd.get_view())
 
 	'''if len(frame.gestures())>=1:
 	    print "point"'''
@@ -106,13 +105,16 @@ class PymolListener(Leap.Listener):
             translation = frame.hands.rightmost.translation(self.prev_frame)
             #print translation.to_float_array()
             cmd.translate(translation.to_float_array())
+	
+        '''view = list(cmd.get_view())
 
-        '''if frame.scale_probability(self.prev_frame) > 0.1:
+        if frame.scale_probability(self.prev_frame) > 0.1 and len(frame.hands)==1:
             s = frame.scale_factor(self.prev_frame)
             delta_z = math.log(s) * 100.0
             view[11] += delta_z
             view[15] -= delta_z
-            view[16] -= delta_z'''
+            view[16] -= delta_z
+	    cmd.set_view(view)'''
  
         #cmd.set_view(view)
 
