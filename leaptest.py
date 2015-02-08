@@ -125,7 +125,15 @@ class PymolListener(Leap.Listener):
             translation = frame.hands.rightmost.translation(self.prev_frame)
             #print translation.to_float_array()
             cmd.translate(translation.to_float_array())
-	
+	    
+        elif self.mode == 'edit' and len(frame.hands) == 1:
+            if frame.hands[0].is_right:
+                translation = frame.hands[0].translation(self.prev_frame)
+                cmd.translate(translation.to_float_array(),'chain A')
+            elif frame.hands[0].is_left:
+                translation = frame.hands[0].translation(self.prev_frame)
+                cmd.translate(translation.to_float_array(),'chain B')
+        
         '''view = list(cmd.get_view())
 
         if frame.scale_probability(self.prev_frame) > 0.1 and len(frame.hands)==1:
@@ -135,14 +143,6 @@ class PymolListener(Leap.Listener):
             view[15] -= delta_z
             view[16] -= delta_z
 	    cmd.set_view(view)'''
- 
-        elif self.mode == 'edit' and len(frame.hands) == 1:
-            if frame.hands[0].is_right:
-                translation = frame.hands[0].translation(self.prev_frame)
-                cmd.translate(translation.to_float_array(),'chain A')
-            elif frame.hands[0].is_left:
-                translation = frame.hands[0].translation(self.prev_frame)
-                cmd.translate(translation.to_float_array(),'chain B')
 
 
 	#Rift support
