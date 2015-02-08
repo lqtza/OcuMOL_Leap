@@ -32,7 +32,6 @@ class PymolListener(Leap.Listener):
  
     def __del__(self):
         self.controller.remove_listener(self)
- 
         super(PymolListener, self).__del__()
  
     def on_init(self, controller):
@@ -87,9 +86,10 @@ class PymolListener(Leap.Listener):
                             self.mode = 'edit'
                         else:
                             self.mode = 'view'
-			do_rotation = False
-			do_translation = False
+                        do_rotation = False
+                        do_translation = False
                         print 'Changing mode to: ' + self.mode
+                        time.sleep(0.6)
 			break
 
 	'''if len(frame.gestures())>=1:
