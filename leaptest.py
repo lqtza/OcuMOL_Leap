@@ -5,22 +5,22 @@ from pymol import cmd
 from rift import PyRift
 
 import transformations as tran
- 
-sys.path.append("/Users/mariusz/code/LeapSDK/lib")
-#sys.path.append("/Users/lqtza/Downloads/LeapDeveloperKit/LeapSDK/lib")
- 
+
+#sys.path.append("/Users/mariusz/code/LeapSDK/lib")
+sys.path.append("/Users/lqtza/Downloads/LeapDeveloperKit/LeapSDK/lib")
+
 import Leap
 from Leap import Matrix, Vector, CircleGesture
- 
+
 class PymolListener(Leap.Listener):
     def __init__(self, *args, **kwargs):
         super(PymolListener, self).__init__(*args, **kwargs)
- 
+
         self.prev_frame = None
         self.view_do_rotation = False
         self.view_do_translation = False
         self.mode = 'view' #this should be binary edit or view
- 
+
         self.controller = Leap.Controller()
         self.controller.add_listener(self)
 	#self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
@@ -29,17 +29,17 @@ class PymolListener(Leap.Listener):
         self.rft=PyRift()
         self.prevrf = [0,0,0]
         self.currf = [0,0,0]
- 
+
     def __del__(self):
         self.controller.remove_listener(self)
         super(PymolListener, self).__del__()
- 
+
     def on_init(self, controller):
         print "Initialized"
 
     def on_connect(self, controller):
         print "Connected"
-        
+
         # Enable gestures
         self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
         self.controller.enable_gesture(Leap.Gesture.TYPE_SWIPE)
@@ -55,7 +55,7 @@ class PymolListener(Leap.Listener):
     def on_frame(self, controller):
         frame = controller.frame()
         #print self.view_do_rotation
-        
+
         if self.mode == 'view':
             # Two hands and open hand on the leftmost should allow for rotation
             if len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius > 75:
@@ -68,14 +68,14 @@ class PymolListener(Leap.Listener):
     	    else:
 	        self.view_do_rotation = False
 	        self.view_do_translation = False
-        
+
         self.update_view(frame,self.view_do_rotation, self.view_do_translation)
         self.prev_frame = frame
- 
+
     def update_view(self, frame, do_rotation, do_translation):
         if not self.prev_frame:
             return
- 
+
         #check what mode to set, also make directional in future
         if len(frame.hands) == 2:
             for gest in frame.gestures():
@@ -109,7 +109,7 @@ class PymolListener(Leap.Listener):
             	cmd.center("all")
 	    elif len(frame.hands)==2:
 		cmd.orient("all")
- 
+
         if frame.hands.rightmost.rotation_probability(self.prev_frame) > 0.1 and do_rotation == True:
             #print 'rotating'
             rotation_about_x = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.x_axis)
@@ -130,15 +130,15 @@ class PymolListener(Leap.Listener):
             translation = frame.hands.rightmost.translation(self.prev_frame)
             #print translation.to_float_array()
             cmd.translate(translation.to_float_array())
-	    
+
         elif self.mode == 'edit' and len(frame.hands) == 1:
             if frame.hands[0].is_right:
                 translation = frame.hands[0].translation(self.prev_frame)
-                cmd.translate(translation.to_float_array(),'chain A')
+                cmd.translate(translation.to_float_array(),'EcZapA.clean')
             elif frame.hands[0].is_left:
                 translation = frame.hands[0].translation(self.prev_frame)
-                cmd.translate(translation.to_float_array(),'chain B')
-        
+                cmd.translate(translation.to_float_array(),'EcFtsZ_AB.clean')
+
         '''view = list(cmd.get_view())
 
         if frame.scale_probability(self.prev_frame) > 0.1 and len(frame.hands)==1:
@@ -162,6 +162,5 @@ class PymolListener(Leap.Listener):
 	cmd.turn('z',diff[2]*100)
 
 	self.prevrf = self.currf
- 
-listener = PymolListener()
 
+listener = PymolListener()
