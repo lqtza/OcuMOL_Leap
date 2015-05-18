@@ -26,3 +26,5 @@ while True:
     cmd.turn('z',diff[2]*100)
 
     prevrf = currf
+
+    time.sleep(0.3)

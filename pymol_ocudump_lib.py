@@ -18,10 +18,10 @@ while True:
 
     diff = [currf[0]-prevrf[0],currf[1]-prevrf[1],currf[2]-prevrf[2]]
 
-    cmd.turn('x',diff[0]*100)
-    cmd.turn('y',diff[1]*100)
-    cmd.turn('z',diff[2]*100)
+    cmd.turn('x',diff[0]*10)
+    cmd.turn('y',diff[1]*10)
+    cmd.turn('z',diff[2]*10)
     
-    time.sleep(0.6)
+    time.sleep(0.3)
 
     prevrf = currf
