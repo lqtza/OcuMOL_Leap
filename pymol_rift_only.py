@@ -2,8 +2,9 @@ from pymol import cmd
 from rift import PyRift
 import sys
 import time
-sys.path.append("/Users/jjeliazkov/Downloads/OcuMOL_Leap/")
-sys.path.append("/Users/jjeliazkov/Downloads/python-rift/")
+#sys.path.append("/Users/jjeliazkov/Downloads/OcuMOL_Leap/")
+#sys.path.append("/Users/jjeliazkov/Downloads/python-rift/")
+sys.path.append("/Users/lqtza/OcuMOL_Leap/")
 import transformations as trans
 
 
