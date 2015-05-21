@@ -1,6 +1,8 @@
 # OcuMOL_Leap
 Incorporating the Oculus Rift and Leap Motion into PyMOL.
 
+**Note PyMOL must use system Python (freeware PyMOL should work fine, but only one of the licensed version will do).**
+
 ## Oculus Rift Only
 1) Go on over to https://github.com/telamonian/ocudump/ and clone that repo. Follow the directions. 
     Be certain that your versions of the Oculus SDK and Runtime are identical. Be sure to run 'make ocudump_cython'.
