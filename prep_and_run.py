@@ -2,9 +2,8 @@ from pymol import cmd
 from pymol import util
 import time
 import sys
-sys.path.append("/Users/lqtza/Hacks/ocudump/build")
-from src.cython.ocudump_cython import Ocudump
-#sys.path.append("/Users/jjeliazkov/Downloads/python-rift/")
+sys.path.append("/Users/lqtza/Hacks/ocudump/build/src/cython")
+from ocudump import Ocudump
 
 #initialize
 o = Ocudump()
