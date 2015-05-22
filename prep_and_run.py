@@ -4,7 +4,6 @@ import time
 import sys
 sys.path.append("/Users/lqtza/Hacks/ocudump/build")
 from src.cython.ocudump import Ocudump
-#sys.path.append("/Users/jjeliazkov/Downloads/python-rift/")
 
 #initialize
 o = Ocudump()

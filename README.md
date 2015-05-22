@@ -1,14 +1,17 @@
 # OcuMOL_Leap
 Incorporating the Oculus Rift and Leap Motion into PyMOL.
 
-## Oculus Rift Only
-1) Go on over to https://github.com/telamonian/ocudump/ and clone that repo. Follow the directions. 
-    Be certain that your versions of the Oculus SDK and Runtime are identical. Be sure to run 'make ocudump_cython'.
-    This will ensure you have the python libraries necessary to run our scripts.
+**Note PyMOL must use system Python (freeware PyMOL should work fine, but only the `syspython` versions of licensed PyMOL will work).**
 
-2) Assuming you have PyMOL, spawning the 'prep_and_run.py' script from within PyMOL should send you on your way.
-    If it doesn't, check to make sure your PYTHONPATH points to all the goodies. I set it in the prep_and_run script.
-    Be sure to spawn the script and not run. Also, being in the the OcuMOL_Leap directoy won't hurt.
+## Oculus Rift Only
+1. Clone the ocudump repository from https://github.com/telamonian/ocudump/. Follow the directions. This should generate a cython library (called `ocudump.so`) from the Oculus SDK. Your versions of the Oculus SDK and Runtime should be identical (this has been tested with 0.5 on Mac OS X 10.10).
+
+2. Clone this repository (OcuMOL_Leap). Open the `prep_and_run.py` script in an editor. Near the top of the script there is a line which reads:  
+`sys.path.append("/Users/lqtza/Hacks/ocudump/build/src/cython")`  
+Change this path so it points to the directory in which you built your `ocudump.so` file. If you followed the instructions from the ocudump readme, this would be:  
+`sys.path.append("<path-to-your-ocudump-repository>/build/src/cython")`
+
+3. Assuming you have PyMOL (we used the latest Schrodinger system Python version, `MacPyMOL-v1.7.6.0-syspython.dmg`), running 'spawn prep_and_run.py' script from within PyMOL should work. If it doesn't, check to make sure your PYTHONPATH includes the 'ocudump' library. It can be set within the prep_and_run.py script.
 
 ## Oculus Rift and Leap Motion
 This will be coming soon. There's some issues to iron out.
