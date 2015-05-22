@@ -3,7 +3,7 @@ from pymol import util
 import time
 import sys
 sys.path.append("/Users/lqtza/Hacks/ocudump/build")
-from src.cython.ocudump_cython import Ocudump
+from src.cython.ocudump import Ocudump
 #sys.path.append("/Users/jjeliazkov/Downloads/python-rift/")
 
 #initialize
