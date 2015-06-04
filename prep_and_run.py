@@ -2,8 +2,8 @@ from pymol import cmd
 from pymol import util
 import time
 import sys
-sys.path.append("/Users/lqtza/Hacks/ocudump/build/src/cython")
-from ocudump import Ocudump
+sys.path.append("/Users/lqtza/Hacks/ocudump/build")
+from src.cython.ocudump import Ocudump
 
 # oculus tracking data refresh rate, in Hz
 trackingRefresh = 60
