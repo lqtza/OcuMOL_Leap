@@ -5,6 +5,9 @@ import sys
 sys.path.append("/Users/lqtza/Hacks/ocudump/build/src/cython")
 from ocudump import Ocudump
 
+# oculus tracking data refresh rate, in Hz
+trackingRefresh = 60
+
 #initialize
 o = Ocudump()
 #load pdb
@@ -47,6 +50,6 @@ while True:
     cmd.turn('y',diff[1]*75)
     cmd.turn('z',diff[2]*75)
     
-    time.sleep(0.1)
+    time.sleep(1/float(trackingRefresh))
 
     prevrf = currf
