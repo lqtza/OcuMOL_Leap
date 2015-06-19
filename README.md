@@ -13,5 +13,7 @@ Change this path so it points to the directory in which you built your `ocudump.
 
 3. Assuming you have PyMOL (we used the latest Schrodinger system Python version, `MacPyMOL-v1.7.6.0-syspython.dmg`), running 'spawn prep_and_run.py' script from within PyMOL should work. If it doesn't, check to make sure your PYTHONPATH includes the 'ocudump' library. It can be set within the prep_and_run.py script.
 
+**Note: The Python script will crash if the Oculus Rift is not connected.**
+
 ## Oculus Rift and Leap Motion
 This will be coming soon. There's some issues to iron out.
