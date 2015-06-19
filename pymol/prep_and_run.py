@@ -68,12 +68,15 @@ while True:
     #print o.pose [pitch (x), yaw (z), roll (y)]
     currf = o.pose
 
-    diff = [currf[0]-prevrf[0],currf[1]-prevrf[1],currf[2]-prevrf[2]]
+    rot_diff = [currf[0]-prevrf[0],currf[1]-prevrf[1],currf[2]-prevrf[2]]
+    pos_diff = [curff[3], currf[4], curff[5]]
     #diff = currf
 
-    cmd.turn('x',-diff[0]*25)
-    cmd.turn('y',-diff[1]*25)
-    cmd.turn('z',-diff[2]*25)
+    cmd.turn('x',-rot_diff[0]*25)
+    cmd.turn('y',-rot_diff[1]*25)
+    cmd.turn('z',-rot_diff[2]*25)
+
+    cmd.translate(pos_diff)
     
     time.sleep(1/float(trackingRefresh))
 
