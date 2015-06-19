@@ -16,7 +16,7 @@ Incorporating the Oculus Rift and Leap Motion into PyMOL.
     - If you don't do this, when PyMOL goes full screen it may end up on the wrong display.
 
 ### Software Setup
-- Clone the ocudump repository from https://github.com/telamonian/ocudump/. Follow the directions. This should generate a cython library (called `ocudump.so`) from the Oculus SDK. Your versions of the Oculus SDK and Runtime should be identical (this has been tested with 0.5 on Mac OS X 10.10).
+- Clone the ocudump repository from https://github.com/telamonian/ocudump/. Follow the directions. This should generate a cython library (called `ocudump.so`) from the Oculus SDK. Your versions of the Oculus SDK and Runtime should be identical (this has been tested with SDK v0.5 on Mac OS X 10.10, and with SDK v0.6 on Windows 7).
 
 - Clone this repository (OcuMOL_Leap). Open the `prep_and_run.py` script in an editor. Near the top of the script there is a line which reads:  
 `sys.path.append("/Users/lqtza/Hacks/ocudump/build/src/cython")`  
