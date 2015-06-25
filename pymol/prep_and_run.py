@@ -25,6 +25,7 @@ cmd.clip('move',10)
 
 #set stereo mode
 cmd.set('stereo_mode',3)
+cmd.set('stereo_angle',0.75)
 cmd.stereo()
 
 #get rid of gui
@@ -62,6 +63,7 @@ def set_origin_at_camera():
     cmd.origin(position=view[12:15] - view[9:12].dot(view[0:9].reshape((3,3)).T))
 
 set_origin_at_camera()
+
 while True:
     #Rift support
     o.getPose()
@@ -76,7 +78,7 @@ while True:
     cmd.turn('y',-rot_diff[1]*25)
     cmd.turn('z',-rot_diff[2]*25)
 
-    cmd.translate(pos_diff)
+    #cmd.translate(pos_diff)
     
     time.sleep(1/float(trackingRefresh))
 
