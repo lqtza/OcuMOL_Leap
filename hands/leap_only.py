@@ -2,7 +2,6 @@ import sys
 import math
 import time
 from pymol import cmd
-from rift import PyRift
 
 #sys.path.append("/Users/mariusz/code/LeapSDK/lib")
 sys.path.append("/Users/mariusz/code/LeapSDK/lib")
@@ -21,6 +20,7 @@ class PymolListener(Leap.Listener):
 
         self.controller = Leap.Controller()
         self.controller.add_listener(self)
+	self.controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
 	#self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
 
         self.circom=1
