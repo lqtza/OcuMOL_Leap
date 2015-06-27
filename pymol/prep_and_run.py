@@ -3,7 +3,7 @@ from pymol import util
 import time
 import numpy as np
 import sys
-sys.path.append("/Users/lqtza/Hacks/ocudump/build/src/cython")
+sys.path.append("/Users/mariusz/code/ocudump/build/src/cython")
 from ocudump import Ocudump
 
 # oculus tracking data refresh rate, in Hz
@@ -34,7 +34,7 @@ cmd.set('internal_gui',0)
 cmd.viewport(1920,1080)
  
 #full screen
-cmd.full_screen('on')
+#cmd.full_screen('on')
 
 prevrf = [0,0,0]
 
