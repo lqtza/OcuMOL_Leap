@@ -3,7 +3,7 @@ from pymol import util
 import time
 import numpy as np
 import sys
-sys.path.append("/Users/mariusz/code/ocudump/build/src/cython")
+sys.path.append("/Users/lqtza/Hacks/ocudump/build/src/cython")
 from ocudump import Ocudump
 
 class PyMOLViewer(object):
@@ -13,12 +13,12 @@ class PyMOLViewer(object):
         self.tracking_refresh = 60
         self.prev_frame_pos = [0,0,0]
         self.ocu_dump = Ocudump()
-	self.init_pymol("3ceg")
-	self.visualize()
+        self.init_pymol("3ceg")
+        self.visualize()
     
-    def init_pymol(self,pdb):
+    def init_pymol(self,pdb='3ceg'):
         #load pdb
-        cmd.fetch('3ceg',async=0)
+        cmd.fetch(pdb,async=0)
         #color each chain differently
         cmd.hide('everything','all')
         cmd.show('cartoon','all')
@@ -47,15 +47,15 @@ class PyMOLViewer(object):
 
     def set_origin_at_camera(self):
         view = np.array(cmd.get_view())
+        # faster (?) version
+        cmd.origin(position=view[12:15] - view[9:12].dot(view[0:9].reshape((3,3)).T))
             
-            # simple version
+        # simple version
         #     rot = view[0:9].reshape((3,3))
         #     camera = view[9:12]
         #     model = view[12:15]
         #     cmd.origin(position=model - camera.dot(rot.T))
         
-            # faster (?) version
-        cmd.origin(position=view[12:15] - view[9:12].dot(view[0:9].reshape((3,3)).T))
 
     def visualize(self):
         while True:
@@ -63,7 +63,7 @@ class PyMOLViewer(object):
             self.ocu_dump.getPose()
             #print ocu_dump.pose [pitch (x), yaw (z), roll (y)]
             currf = self.ocu_dump.pose
-	    prevrf=self.prev_frame_pos
+            prevrf = self.prev_frame_pos
 
             rot_diff = [currf[0]-prevrf[0],currf[1]-prevrf[1],currf[2]-prevrf[2]]
             pos_diff = [currf[3], currf[4], currf[5]]
@@ -78,5 +78,6 @@ class PyMOLViewer(object):
             time.sleep(1/float(self.tracking_refresh))
 
             self.prev_frame_pos = currf
-
-pcls=PyMOLViewer()
+if __name__ == '__main__':
+    #do not run if imported as module
+    pcls=PyMOLViewer()
