@@ -78,6 +78,7 @@ class PyMOLViewer(object):
             time.sleep(1/float(self.tracking_refresh))
 
             self.prev_frame_pos = currf
-if __name__ == '__main__':
+#if __name__ == '__main__':
     #do not run if imported as module
-    pcls=PyMOLViewer()
+pcls=PyMOLViewer()
+print "i idiot"
