@@ -1,0 +1,4 @@
+import os
+sys.path.append("/Users/lqtza/Hacks/pymol")
+sys.path.append("/Users/lqtza/Hacks/hands")
+sys.path.append("/Users/lqtza/Hacks/LeapDeveloperKit/LeapSDK/lib")
