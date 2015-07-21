@@ -1,3 +1,4 @@
 *~
 *.pdb
 *.local
+config.py

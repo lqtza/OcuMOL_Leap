@@ -10,6 +10,7 @@ import Pmw
 import pymol
 import sys
 import os
+import config
 
 
 def __init__(self):
