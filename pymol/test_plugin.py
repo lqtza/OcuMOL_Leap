@@ -10,8 +10,11 @@ import Pmw
 import pymol
 import sys
 import os
-import config
 
+#hard coded paths... just don't
+sys.path.append("/Users/lqtza/Hacks/OcuMOL_Leap/pymol")
+sys.path.append("/Users/lqtza/Hacks/OcuMOL_Leap/hands")
+sys.path.append("/Users/lqtza/Hacks/LeapDeveloperKit/LeapSDK/lib")
 
 def __init__(self):
     """
@@ -85,8 +88,6 @@ class OcuMOLLeap:
             print 'You clicked on, ' + result
             if result == 'Run Rift Only':
                 # Rift needs to be connected for this to run.
-                rift_module_path = os.path.join(os.environ["OCUMOLPATH"],"pymol")
-                sys.path.append(rift_module_path)
                 from oo_prep_and_run import PyMOLViewer
 
                 # PyMOL will crash if Rift is off or not connected.
@@ -95,8 +96,6 @@ class OcuMOLLeap:
             elif result == 'Run Leap Only':
                 # Leap Motion needed for this... name convention is poor.
                 # Currently doesn't work... exits on init.
-                leap_module_path = os.path.join(os.environ["OCUMOLPATH"],"hands")
-                sys.path.append(leap_module_path)
                 from leap_only import PymolListener
 
                 test_listener = PymolListener()
