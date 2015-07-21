@@ -2,10 +2,11 @@ import sys
 import math
 import time
 from pymol import cmd
-
-#sys.path.append("/Users/mariusz/code/LeapSDK/lib")
-sys.path.append("/Users/mariusz/code/LeapSDK/lib")
-
+import os
+# Point to Leap SDK
+leap_path = os.path.join()
+sys.path.append(os.environ["LEAPPATH"])
+# Import Leap
 import Leap
 from Leap import Matrix, Vector, CircleGesture
 
@@ -157,5 +158,6 @@ class PymolListener(Leap.Listener):
 	cmd.turn('z',diff[2]*100)
 
 	self.prevrf = self.currf'''
-
-listener = PymolListener()
+    
+if __name__ == '__main__':
+    listener = PymolListener()

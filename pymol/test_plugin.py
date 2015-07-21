@@ -1,15 +1,16 @@
 """
-    A test plugin for PyMOL
+    An OcuMOL Leap plugin for PyMOL. To install go to the Plugin menu in PyMOL
+    and under the Install New Plugin tab click Choose file... and select this file.
+    Set the environmental variable, OCUMOLPATH, to point to the repository directory:
+    export OCUMOLPATH=/Users/lqtza/Hacks/OcuMOL_Leap
 """
 import Tkinter
 from Tkinter import *
 import Pmw
 import pymol
 import sys
+import os
 
-#lazy way to add Rift Mover to PYTHONPATH
-sys.path.append("/Users/lqtza/Hacks/OcuMOL_Leap/pymol/")
-from oo_prep_and_run import PyMOLViewer
 
 def __init__(self):
     """
@@ -42,10 +43,22 @@ class OcuMOLLeap:
         self.notebook.pack(fill='both',expand=1,padx=10,pady=10)
 
         #Create Oculus Rift Page
+        #One should be able to set the location of the rift mover in here
         page = self.notebook.add('Rift Visualizer')
+        group = Pmw.Group(page, tag_text = 'Oculus Rift Visualizer')
+        group.pack(fill = 'both', expand = 1, padx = 10, pady = 5)
 
         #Create Leap Motion Page
         page = self.notebook.add('Leap Mover')
+        group = Pmw.Group(page, tag_text = 'Leap Motion Mover')
+        group.pack(fill = 'both', expand = 1, padx = 10, pady = 5)
+        leap_opt = Pmw.OptionMenu(group.interior(),
+                                    labelpos = 'w',
+                                    label_text = 'Mover Mode',
+                                    items = ('Move','Edit',),
+                                    initialitem = 'Move',
+                                    )
+        leap_opt.pack(fill='x',expand=1,padx=4,pady=1)
 
         #Create About Page
         page = self.notebook.add('About')
@@ -71,10 +84,22 @@ class OcuMOLLeap:
             print 'You clicked on, ' + result
             if result == 'Run Rift Only':
                 # Rift needs to be connected for this to run.
+                rift_module_path = os.path.join(os.environ["OCUMOLPATH"],"pymol")
+                sys.path.append(rift_module_path)
+                from oo_prep_and_run import PyMOLViewer
+
                 # PyMOL will crash if Rift is off or not connected.
                 test_viewer = PyMOLViewer()
+
             elif result == 'Run Leap Only':
-                print 'Inner if, should create an object of the LeapMover class.'
+                # Leap Motion needed for this... name convention is poor.
+                # Currently doesn't work... exits on init.
+                leap_module_path = os.path.join(os.environ["OCUMOLPATH"],"hands")
+                sys.path.append(leap_module_path)
+                from leap_only import PymolListener
+
+                test_listener = PymolListener()
+
             elif result == 'Run Both':
                 print 'Inner if, should create a Viewer and Mover object.'
         else:
