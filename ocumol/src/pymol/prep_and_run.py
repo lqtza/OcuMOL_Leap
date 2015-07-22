@@ -3,7 +3,7 @@ from pymol import util
 import time
 import numpy as np
 import sys
-sys.path.append("/Users/mariusz/code/ocudump/build/src/cython")
+sys.path.append("/Users/tel/git/ocudump/build/src/cython")
 from ocudump import Ocudump
 
 # oculus tracking data refresh rate, in Hz

@@ -13,9 +13,9 @@ import os
 from pymol import cmd
 
 #hard coded paths... just don't
-sys.path.append("/Users/lqtza/Hacks/OcuMOL_Leap/pymol")
-sys.path.append("/Users/lqtza/Hacks/OcuMOL_Leap/hands")
-sys.path.append("/Users/lqtza/Hacks/LeapDeveloperKit/LeapSDK/lib")
+sys.path.append("/Users/tel/git/OcuMOL_Leap/pymol")
+sys.path.append("/Users/tel/git/OcuMOL_Leap/hands")
+#sys.path.append("/Users/lqtza/Hacks/LeapDeveloperKit/LeapSDK/lib")
 
 def __init__(self):
     """
@@ -89,7 +89,7 @@ class OcuMOLLeap:
             print 'You clicked on, ' + result
             if result == 'Run Rift Only':
                 # more shitty hard coding
-                cmd.do('spawn /Users/lqtza/Hacks/OcuMOL_Leap/pymol/oo_prep_and_run.py')
+                cmd.do('spawn /Users/tel/git/OcuMOL_Leap/pymol/oo_prep_and_run.py')
                 # Rift needs to be connected for this to run.
                 # from oo_prep_and_run import PyMOLViewer
 

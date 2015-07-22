@@ -2,3 +2,6 @@
 *.pdb
 *.local
 config.py
+*.pyc
+.project
+.pydevproject

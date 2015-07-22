@@ -2,21 +2,21 @@ from pymol import cmd
 from pymol import util
 import time
 import numpy as np
-import sys
-import threading
-sys.path.append("/Users/lqtza/Hacks/ocudump/build/src/cython")
+import os
 from ocudump import Ocudump
 
-class PyMOLViewer(threading.Thread):
-    
-    def __init__(self):
-        threading.Thread.__init__(self)
+pymolViewerScript = os.path.realpath(__file__)
+
+class PyMOLViewer(object):
+    def __init__(self, naturalRotation=True):
+        self.naturalRotation = naturalRotation
+        self.ocudump = Ocudump()
+        self.prev_frame_pos = [0,0,0]
         # oculus tracking data refresh rate, in Hz
         self.tracking_refresh = 60
-        self.prev_frame_pos = [0,0,0]
-        self.ocu_dump = Ocudump()
+        
         self.init_pymol("3ceg")
-        #self.visualize()
+        self.visualize()
     
     def init_pymol(self,pdb='3ceg'):
         #load pdb
@@ -44,9 +44,6 @@ class PyMOLViewer(threading.Thread):
         #full screen
         #cmd.full_screen('on')
 
-        #set origin at camera
-        self.set_origin_at_camera()
-
     def set_origin_at_camera(self):
         view = np.array(cmd.get_view())
         # faster (?) version
@@ -62,9 +59,9 @@ class PyMOLViewer(threading.Thread):
     def visualize(self):
         while True:
             #Rift support
-            self.ocu_dump.getPose()
-            #print ocu_dump.pose [pitch (x), yaw (z), roll (y)]
-            currf = self.ocu_dump.pose
+            self.ocudump.getPose()
+            #print ocudump.pose [pitch (x), yaw (z), roll (y)]
+            currf = self.ocudump.pose
             prevrf = self.prev_frame_pos
 
             rot_diff = [currf[0]-prevrf[0],currf[1]-prevrf[1],currf[2]-prevrf[2]]
@@ -77,14 +74,13 @@ class PyMOLViewer(threading.Thread):
 
             #cmd.translate(pos_diff)
             
+            if self.naturalRotation:
+                self.set_origin_at_camera()
+            
             time.sleep(1/float(self.tracking_refresh))
-
+            
             self.prev_frame_pos = currf
-
-    def run(self):
-        self.visualize()
-
 #if __name__ == '__main__':
     #do not run if imported as module
 pcls=PyMOLViewer()
-pcls.start()
+print "i idiot"
