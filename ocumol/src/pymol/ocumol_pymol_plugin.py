@@ -97,7 +97,7 @@ class OcuMOLLeap:
 
                 # PyMOL will crash if Rift is off or not connected.
                 hmd = PymolHmd()
-                hmd.run()
+                hmd.start()
 
             elif result == 'Run Leap Only':
                 # Leap Motion needed for this... name convention is poor.
