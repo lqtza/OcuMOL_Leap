@@ -3,20 +3,22 @@ from pymol import util
 import time
 import numpy as np
 import os
+import threading
+
+pymolViewerThreadedScript = os.path.realpath(__file__)
+
 from ocudump import Ocudump
 
-pymolViewerScript = os.path.realpath(__file__)
-
-class PyMOLViewer(object):
+class PyMOLViewerThreaded(threading.Thread):
+    
     def __init__(self, naturalRotation=True):
-        self.naturalRotation = naturalRotation
-        self.ocudump = Ocudump()
-        self.prev_frame_pos = [0,0,0]
+        threading.Thread.__init__(self)
         # oculus tracking data refresh rate, in Hz
         self.tracking_refresh = 60
-        
+        self.prev_frame_pos = [0,0,0]
+        self.ocudump = Ocudump()
         self.init_pymol("3ceg")
-        self.visualize()
+        #self.visualize()
     
     def init_pymol(self,pdb='3ceg'):
         #load pdb
@@ -43,6 +45,9 @@ class PyMOLViewer(object):
          
         #full screen
         #cmd.full_screen('on')
+
+        #set origin at camera
+        self.set_origin_at_camera()
 
     def set_origin_at_camera(self):
         view = np.array(cmd.get_view())
@@ -78,9 +83,13 @@ class PyMOLViewer(object):
                 self.set_origin_at_camera()
             
             time.sleep(1/float(self.tracking_refresh))
-            
+
             self.prev_frame_pos = currf
-#if __name__ == '__main__':
+
+    def run(self):
+        self.visualize()
+
+if __name__ == '__main__':
     #do not run if imported as module
-pcls=PyMOLViewer()
-print "i idiot"
+    pcls=PyMOLViewerThreaded()
+    pcls.start()

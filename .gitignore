@@ -1,7 +1,12 @@
+*.pyc
+*.egg-info
+build
+dist
+
 *~
+config.py
 *.pdb
 *.local
-config.py
-*.pyc
+
 .project
 .pydevproject
