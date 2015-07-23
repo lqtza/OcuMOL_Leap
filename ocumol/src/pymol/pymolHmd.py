@@ -5,11 +5,11 @@ import numpy as np
 import os
 import threading
 
-pymolViewerThreadedScript = os.path.realpath(__file__)
+pymolHmdScript = os.path.realpath(__file__)
 
 from ocudump import Ocudump
 
-class PyMOLViewerThreaded(threading.Thread):
+class PymolHmd(threading.Thread):
     
     def __init__(self, naturalRotation=True):
         threading.Thread.__init__(self)
@@ -91,5 +91,5 @@ class PyMOLViewerThreaded(threading.Thread):
 
 if __name__ == '__main__':
     #do not run if imported as module
-    pcls=PyMOLViewerThreaded()
+    pcls=PymolHmd()
     pcls.start()
