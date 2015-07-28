@@ -7,9 +7,9 @@ class CustomInstallCommand(install):
     install command customized to set path to leap motion packages
     '''
     def run(self):
-        leap_lib_dir = os.environ.get('LEAP_LIB_DIR')
+        leapsdk_dir = os.environ.get('LEAPSDK_DIR')
         with open('ocumol/leap_config.py', 'w') as f:
-            f.write('leap_path = %s' % leap_lib_dir)
+            f.write("leap_path = '%s'" % os.path.join(leapsdk_dir, 'lib'))
         install.run(self)
 
 setup(
