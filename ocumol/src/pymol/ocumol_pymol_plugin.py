@@ -82,6 +82,10 @@ class OcuMOLLeap:
         bar.pack(side=LEFT,expand="yes",fill="y")
         interior_frame.pack(expand="yes",fill="both")
 
+	#create placeholders for listeners
+	self.hmd=0
+	self.hand=0
+
         #self.notebook.setnaturalsize()
 
         self.dialog.show()
@@ -96,13 +100,13 @@ class OcuMOLLeap:
 #                 from oo_prep_and_run import PyMOLViewer
 
                 # PyMOL will crash if Rift is off or not connected.
-                hmd = PymolHmd()
-                hmd.start()
+                self.hmd = PymolHmd()
+                self.hmd.start()
 
             elif result == 'Run Leap Only':
                 # Leap Motion needed for this... name convention is poor.
                 # Currently doesn't work... exits on init.
-                test_listener = PymolListener()
+                self.hand = PymolListener()
 
             elif result == 'Run Both':
                 print 'Inner if, should create a Viewer and Mover object.'
