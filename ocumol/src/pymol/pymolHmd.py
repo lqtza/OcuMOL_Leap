@@ -14,10 +14,14 @@ class PymolHmd(threading.Thread):
     def __init__(self, naturalRotation=True):
         threading.Thread.__init__(self)
         # oculus tracking data refresh rate, in Hz
-        self.tracking_refresh = 60
-        self.prev_frame_pos = [0,0,0]
-        self.ocudump = Ocudump()
+        
         self.init_pymol("3ceg")
+        self.ocudump = Ocudump()
+        self.prev_frame_pos = [0,0,0]
+        
+        self.rotation_scaling = 25
+        self.tracking_refresh = 60
+        self.translation_scaling = 1
         #self.visualize()
     
     def init_pymol(self,pdb='3ceg'):
@@ -48,7 +52,11 @@ class PymolHmd(threading.Thread):
 
         #set origin at camera
         self.set_origin_at_camera()
-
+    
+    def init_camera(self):
+        self.ocudump.getPose()
+        self.base_pose = self.ocudump.pose
+    
     def set_origin_at_camera(self):
         view = np.array(cmd.get_view())
         # faster (?) version
@@ -62,20 +70,33 @@ class PymolHmd(threading.Thread):
         
 
     def visualize(self):
+        self.init_camera()
         while True:
             #Rift support
             self.ocudump.getPose()
             #print ocudump.pose [pitch (x), yaw (z), roll (y)]
-            currf = self.ocudump.pose
-            prevrf = self.prev_frame_pos
+            pose = self.ocudump.pose
+            #prevrf = self.prev_frame_pos
 
-            rot_diff = [currf[0]-prevrf[0],currf[1]-prevrf[1],currf[2]-prevrf[2]]
-            pos_diff = [currf[3], currf[4], currf[5]]
+            x_rot = pose[0] - self.base_pose[0]
+            y_rot = pose[1] - self.base_pose[1]
+            z_rot = pose[2] - self.base_pose[2]
+            
+            cmd.turn('x',x_rot*self.rotation_scaling)
+            cmd.turn('y',y_rot*self.rotation_scaling)
+            cmd.turn('z',z_rot*self.rotation_scaling)
+            
+#             if self.ocudump.positionTracked:
+                
+#             rot_diff = [currf[0]-prevrf[0],currf[1]-prevrf[1],currf[2]-prevrf[2]]
+#             pos_diff = [currf[3], currf[4], currf[5]]
             #diff = currf
 
-            cmd.turn('x',-rot_diff[0]*25)
-            cmd.turn('y',-rot_diff[1]*25)
-            cmd.turn('z',-rot_diff[2]*25)
+#             cmd.turn('x',-rot_diff[0]*25)
+#             cmd.turn('y',-rot_diff[1]*25)
+#             cmd.turn('z',-rot_diff[2]*25)
+            
+            
 
             #cmd.translate(pos_diff)
             
@@ -84,7 +105,7 @@ class PymolHmd(threading.Thread):
             
             time.sleep(1/float(self.tracking_refresh))
 
-            self.prev_frame_pos = currf
+#             self.prev_frame_pos = currf
 
     def run(self):
         self.visualize()

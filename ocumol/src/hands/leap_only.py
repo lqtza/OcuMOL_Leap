@@ -4,8 +4,8 @@ import time
 from pymol import cmd
 import os
 # Point to Leap SDK
-leap_path = os.path.join()
-sys.path.append(os.environ["LEAPPATH"])
+# leap_path = os.path.join()
+# sys.path.append(os.environ["LEAPPATH"])
 # Import Leap
 import Leap
 from Leap import Matrix, Vector, CircleGesture
@@ -159,5 +159,5 @@ class PymolListener(Leap.Listener):
 
 	self.prevrf = self.currf'''
     
-if __name__ == '__main__':
-    listener = PymolListener()
+# if __name__ == '__main__':
+#     listener = PymolListener()
