@@ -82,9 +82,9 @@ class OcuMOLLeap:
         bar.pack(side=LEFT,expand="yes",fill="y")
         interior_frame.pack(expand="yes",fill="both")
 
-	#create placeholders for listeners
-	self.hmd=0
-	self.hand=0
+        #create placeholders for listeners
+        self.hmd=0
+        self.hand=0
 
         #self.notebook.setnaturalsize()
 
