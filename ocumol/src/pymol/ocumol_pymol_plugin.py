@@ -12,7 +12,7 @@ import sys
 import os
 from pymol import cmd
 
-from ocumol import PymolHmd, PymolListener
+from ocumol import PymolHmd#, PymolListener
 
 #hard coded paths... just don't
 # sys.path.append("/Users/tel/git/OcuMOL_Leap/pymol")
@@ -100,9 +100,10 @@ class OcuMOLLeap:
                 hmd.start()
 
             elif result == 'Run Leap Only':
+                pass
                 # Leap Motion needed for this... name convention is poor.
                 # Currently doesn't work... exits on init.
-                test_listener = PymolListener()
+                #test_listener = PymolListener()
 
             elif result == 'Run Both':
                 print 'Inner if, should create a Viewer and Mover object.'

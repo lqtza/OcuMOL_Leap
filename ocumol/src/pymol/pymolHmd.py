@@ -8,6 +8,7 @@ import threading
 pymolHmdScript = os.path.realpath(__file__)
 
 from ocudump import Ocudump
+from ocumol.tranformations import euler_matrix
 
 class PymolHmd(threading.Thread):
     
@@ -16,9 +17,9 @@ class PymolHmd(threading.Thread):
         # oculus tracking data refresh rate, in Hz
         
         self.init_pymol("3ceg")
+        self.naturalRotation = naturalRotation
         self.ocudump = Ocudump()
         self.prev_frame_pos = [0,0,0]
-        
         self.rotation_scaling = 25
         self.tracking_refresh = 60
         self.translation_scaling = 1
@@ -86,7 +87,14 @@ class PymolHmd(threading.Thread):
             cmd.turn('y',y_rot*self.rotation_scaling)
             cmd.turn('z',z_rot*self.rotation_scaling)
             
-#             if self.ocudump.positionTracked:
+            if self.ocudump.positionTracked:
+                try:
+                    cmd.move('x', pose[4] - self.prev_xyz[0])
+                    cmd.move('y', pose[5] - self.prev_xyz[1])
+                    cmd.move('z', pose[6] - self.prev_xyz[2])
+                except AttributeError:
+                    self.prev_xzy = pose[3:6]
+            
                 
 #             rot_diff = [currf[0]-prevrf[0],currf[1]-prevrf[1],currf[2]-prevrf[2]]
 #             pos_diff = [currf[3], currf[4], currf[5]]

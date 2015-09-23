@@ -5,8 +5,11 @@ dist
 
 *~
 config.py
+leap_config.py
 *.pdb
 *.local
 
+# eclipse stuff
 .project
 .pydevproject
+.settings
