@@ -8,7 +8,7 @@ import threading
 pymolHmdScript = os.path.realpath(__file__)
 
 from ocudump import Ocudump
-from ocumol.tranformations import euler_matrix
+from ocumol.src.helper.transformations import euler_matrix
 
 class PymolHmd(threading.Thread):
     

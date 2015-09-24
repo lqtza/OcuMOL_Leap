@@ -12,7 +12,7 @@ import sys
 import os
 from pymol import cmd
 
-from ocumol import PymolHmd, PymolListener
+from ocumol.src.pymol.pymolHmd import PymolHmd#, PymolListener
 
 #hard coded paths... just don't
 # sys.path.append("/Users/tel/git/OcuMOL_Leap/pymol")

@@ -1,0 +1,12 @@
+####START_OCUMOL_PLUGIN####
+# get the path to the ocumol pymol plugin package
+import ocumol.src.pymol.plugin
+dir = ocumol.src.pymol.plugin.__path__[0]
+
+# Make setting changes to Plugin Manager
+import pymol.plugins
+pymol.plugins.set_startup_path([dir])
+pymol.plugins.preferences = {'instantsave': False, 'verbose': False}
+pymol.plugins.autoload = {'ocumolPymolPlugin': False}
+pymol.plugins.preferences = {'instantsave': True, 'verbose': False}
+####END_OCUMOL_PLUGIN####
