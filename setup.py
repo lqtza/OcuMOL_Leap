@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 import os
 import re
 from setuptools import find_packages, setup
+from setuptools.command.develop import develop
 from setuptools.command.install import install
 
 thisScriptDir = os.path.dirname(os.path.realpath(__file__))
@@ -12,7 +15,7 @@ def EnsureNewline(line):
 
 def ReplaceBtwnLines(fPath, startLine, endLine, txtBlock):
     repRe = re.compile(startLine + '.*' + endLine, re.DOTALL)
-#     startLine, endLine = EnsureNewline(startLine), EnsureNewline(endLine)
+    replTxt = EnsureNewline(startLine) + EnsureNewline(txtBlock) + endLine
     
     try:
         with open(fPath, 'r') as f:
@@ -20,29 +23,33 @@ def ReplaceBtwnLines(fPath, startLine, endLine, txtBlock):
     except IOError:
         return False
     if repRe.search(oldTxt):
-        newTxt = repRe.sub(startLine + txtBlock + endLine, oldTxt)
+        newTxt = repRe.sub(replTxt, oldTxt)
         with open(fPath, 'w') as f:
             f.write(newTxt)
         return True
     else:
         return False
     
-def AppendBlockToFile(fPath, txtBlock):
+def AppendBlockToFile(fPath, startLine, endLine, txtBlock):
     oldTxt = ''
+    newTxt = EnsureNewline(startLine) + EnsureNewline(txtBlock) + endLine
     try:
         with open(fPath, 'r') as f:
             oldTxt = f.read()
+            oldTxt = EnsureNewline(oldTxt) + '\n'
     except IOError:
         pass
     with open(fPath, 'w') as f:
         f.write(oldTxt)
-        f.write('\n')
-        f.write(txtBlock)
+        f.write(newTxt)
     
-class CustomInstallCommand(install):
+class CustomSetupCommand:
     '''
-    customized install command
+    customized setup command base class
+    meant to be used in a subclass that also inherits either setuptools.command.install.install or .develop
     '''
+    leapSDKEnvVar = 'LEAPSDK_DIR'
+    
     def run(self):
         self._writeLeapConfig()
         self._writePymolrc()
@@ -51,13 +58,13 @@ class CustomInstallCommand(install):
         '''
         write config file to set path to leap motion packages
         '''
-        if 'LEAPSDK_DIR' not in os.environ:
-            raise KeyError
-        leapsdk_dir = os.environ.get('LEAPSDK_DIR')
-        with open('ocumol/leap_config.py', 'w') as f:
-            f.write("leap_path = '%s'" % os.path.join(leapsdk_dir, 'lib'))
-        install.run(self)
-        
+        if self.leapSDKEnvVar not in os.environ:
+            raise EnvironmentError('%s%s' % ('You need to set the %s environment variable before installing ocumol, ' % self.leapSDKEnvVar,
+                                             'e.g. you could run `LEAPSDK_DIR=/usr/local/LeapSDK pip install ocumol`'))
+        leapSDKDir = os.environ.get(self.leapSDKEnvVar)
+        with open('ocumol/leapConfig.py', 'w') as f:
+            f.write("leapPath = '%s'" % os.path.join(leapSDKDir, 'lib'))
+         
     def _writePymolrc(self):
         pymolrcPath = os.path.expanduser('~/.pymolrc')
         ocumolStartBumper = '#'*4 + 'START_OCUMOL_PLUGIN' + '#'*4
@@ -65,11 +72,21 @@ class CustomInstallCommand(install):
         with open(os.path.join(thisScriptDir, 'pymolrc'), 'r') as f:
             ocumolPluginTxt = f.read()
         if not ReplaceBtwnLines(pymolrcPath, ocumolStartBumper, ocumolEndBumper, ocumolPluginTxt):
-            AppendBlockToFile(pymolrcPath, ocumolPluginTxt)
+            AppendBlockToFile(pymolrcPath, ocumolStartBumper, ocumolEndBumper, ocumolPluginTxt)
+
+class CustomDevelopCommand(CustomSetupCommand, develop):
+    def run(self):
+        CustomSetupCommand.run(self)
+        develop.run(self)
+
+class CustomInstallCommand(CustomSetupCommand, install):
+    def run(self):
+        CustomSetupCommand.run(self)
+        install.run(self)
 
 setup(
     author = 'Max Klein, Jeliazko Jeliazkov, Henry Lessen, Mariusz Matyszewski',
-    cmdclass = {'install': CustomInstallCommand},
+    cmdclass = {'develop': CustomDevelopCommand,'install': CustomInstallCommand},
     description = 'adds VR support to various molecular viewers',
     license = 'apache',
     name = "ocumol",

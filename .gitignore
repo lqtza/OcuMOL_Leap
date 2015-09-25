@@ -6,6 +6,7 @@ dist
 *~
 config.py
 leap_config.py
+leapConfig.py
 *.pdb
 *.local
 
