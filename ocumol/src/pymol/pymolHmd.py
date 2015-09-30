@@ -12,7 +12,7 @@ from ocumol.src.helper.transformations import euler_matrix
 
 class PymolHmd(threading.Thread):
     
-    def __init__(self, naturalRotation=False):
+    def __init__(self, naturalRotation=True):
 
         threading.Thread.__init__(self)
 

@@ -54,6 +54,12 @@ class OcuMOLLeap:
         page = self.notebook.add('Rift Visualizer')
         group = Pmw.Group(page, tag_text = 'Oculus Rift Visualizer')
         group.pack(fill = 'both', expand = 1, padx = 10, pady = 5)
+        self.radiobuttons = Pmw.RadioSelect(group.interior(),buttontype = 'radiobutton',orient = 'vertical',labelpos = 'w',)
+        self.radiobuttons.add('Natural Rotation')
+        self.radiobuttons.add('Molecule Rotation')
+        self.radiobuttons.setvalue('Natural Rotation')
+        self.radiobuttons.pack(fill='x',padx=4,pady=1)
+
 
         #Create Leap Motion Page
         page = self.notebook.add('Leap Mover')
@@ -94,14 +100,14 @@ class OcuMOLLeap:
         if result:
             print 'You clicked on, ' + result
             if result == 'Run Rift Only':
-                # more shitty hard coding
-#                 cmd.do('spawn /Users/tel/git/OcuMOL_Leap/pymol/oo_prep_and_run.py')
-                # Rift needs to be connected for this to run.
-#                 from oo_prep_and_run import PyMOLViewer
-
                 # PyMOL will crash if Rift is off or not connected.
-                self.hmd = PymolHmd()
-                self.hmd.Run()
+                if self.radiobuttons.get_value() == 'Natural Rotation':
+                    self.hmd = PymolHmd(naturalRotation=True)
+                    self.hmd.Run()
+                else:
+                    self.hmd = PymolHmd(naturalRotation=False)
+                    self.hmd.Run()
+
 
             elif result == 'Run Leap Only':
                 # Leap Motion needed for this... name convention is poor.
