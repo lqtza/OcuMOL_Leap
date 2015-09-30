@@ -50,7 +50,7 @@ class OcuMOLLeap:
         self.notebook.pack(fill='both',expand=1,padx=10,pady=10)
 
         #Create Oculus Rift Page
-        #One should be able to set the location of the rift mover in here
+        #TODO: Add radio buttons here for natural vision T/F
         page = self.notebook.add('Rift Visualizer')
         group = Pmw.Group(page, tag_text = 'Oculus Rift Visualizer')
         group.pack(fill = 'both', expand = 1, padx = 10, pady = 5)
@@ -101,7 +101,7 @@ class OcuMOLLeap:
 
                 # PyMOL will crash if Rift is off or not connected.
                 self.hmd = PymolHmd()
-                self.hmd.start()
+                self.hmd.Run()
 
             elif result == 'Run Leap Only':
                 # Leap Motion needed for this... name convention is poor.
