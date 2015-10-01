@@ -50,7 +50,6 @@ class OcuMOLLeap:
         self.notebook.pack(fill='both',expand=1,padx=10,pady=10)
 
         #Create Oculus Rift Page
-        #TODO: Add radio buttons for retaining formatting and text box for custom pdb
         page = self.notebook.add('Rift Visualizer')
         group = Pmw.Group(page, tag_text = 'Oculus Rift Visualizer')
         group.pack(fill = 'both', expand = 1, padx = 10, pady = 5)
@@ -69,6 +68,12 @@ class OcuMOLLeap:
 
         self.pdb_text = Pmw.EntryField(group.interior(),labelpos='w',label_text='Load PDB ID:',command=None,)
         self.pdb_text.pack(fill='x', padx=4, pady=1)
+
+        self.stereo_shift_text = Pmw.EntryField(group.interior(),labelpos='w',label_text='Stereo shift:',value='5.24',validate = {'validator' : 'real'},modifiedcommand=self.changed,)
+        self.stereo_shift_text.pack(fill='x', padx=4, pady=1)
+
+        self.stereo_angle_text = Pmw.EntryField(group.interior(),labelpos='w',label_text='Stereo angle:',value='2.0',validate = {'validator' : 'real'},modifiedcommand=self.changed,)
+        self.stereo_angle_text.pack(fill='x', padx=4, pady=1)
 
         #Create Leap Motion Page
         page = self.notebook.add('Leap Mover')
@@ -110,6 +115,7 @@ class OcuMOLLeap:
             print 'You clicked on, ' + result
             if result == 'Run Rift Only':
                 # PyMOL will crash if Rift is off or not connected.
+                # how do I make these run in the background?
                 if self.radiobuttons_rot.getvalue() == 'Natural Rotation':
                     if self.radiobuttons_mol.getvalue() == 'Yes':
                         self.hmd = PymolHmd(naturalRotation=True,editMolecule=True,pdb=self.pdb_text.getvalue())
@@ -132,6 +138,11 @@ class OcuMOLLeap:
                 print 'Inner if, should create a Viewer and Mover object.'
         else:
             self.quit()
+
+    def changed(self):
+        # change stereo settings
+        cmd.set('stereo_shift',self.stereo_shift_text.getvalue())
+        cmd.set('stereo_angle',self.stereo_angle_text.getvalue())
 
     def quit(self):
         self.dialog.destroy()
