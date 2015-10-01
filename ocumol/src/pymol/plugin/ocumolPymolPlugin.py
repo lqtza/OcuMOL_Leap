@@ -101,7 +101,7 @@ class OcuMOLLeap:
             print 'You clicked on, ' + result
             if result == 'Run Rift Only':
                 # PyMOL will crash if Rift is off or not connected.
-                if self.radiobuttons.get_value() == 'Natural Rotation':
+                if self.radiobuttons.getvalue() == 'Natural Rotation':
                     self.hmd = PymolHmd(naturalRotation=True)
                     self.hmd.Run()
                 else:

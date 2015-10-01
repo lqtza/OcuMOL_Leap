@@ -127,7 +127,7 @@ class PymolHmd(threading.Thread):
 
             # update camera for "natural rotation"
             if self.naturalRotation:
-                self.set_origin_at_camera()
+                self.SetOriginAtCamera()
 
             # record previous pose for accurate rotation diff
             self.previousPose = pose 
