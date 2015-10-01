@@ -12,12 +12,12 @@ from ocumol.src.helper.transformations import euler_matrix
 
 class PymolHmd(threading.Thread):
     
-    def __init__(self, naturalRotation=True):
+    def __init__(self, naturalRotation=True, pdb='', editMolecule=False):
 
         threading.Thread.__init__(self)
 
         # load pdb into pymol and set up view 
-        self.InitPymol("3ceg")
+        self.InitPymol(pdb,editMolecule=editMolecule)
 
         # define how view rotation is updated
         self.naturalRotation = naturalRotation
@@ -40,14 +40,16 @@ class PymolHmd(threading.Thread):
         # set scaling factor for rotation
         self.rotationScaling = 25
     
-    def InitPymol(self,pdb='3ceg',fullscreen=False):
+    def InitPymol(self,pdb='',fullscreen=False,editMolecule=False):
         # load pdb
-        cmd.fetch(pdb,async=0)
+        if len(pdb) == 4:
+            cmd.fetch(pdb,async=0)
 
         # color each chain differently
-        cmd.hide('everything','all')
-        cmd.show('cartoon','all')
-        util.cbc()
+        if editMolecule:
+            cmd.hide('everything','all')
+            cmd.show('cartoon','all')
+            util.cbc()
         
         # move slab away to give a comfortable viewing area
         cmd.clip('move',10)
@@ -127,7 +129,9 @@ class PymolHmd(threading.Thread):
 
             # update camera for "natural rotation"
             if self.naturalRotation:
-                self.SetOriginAtCamera()
+                # this breaks the code... not sure why
+                #self.SetOriginAtCamera()
+                pass
 
             # record previous pose for accurate rotation diff
             self.previousPose = pose 

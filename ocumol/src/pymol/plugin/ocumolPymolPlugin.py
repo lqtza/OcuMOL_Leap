@@ -50,16 +50,25 @@ class OcuMOLLeap:
         self.notebook.pack(fill='both',expand=1,padx=10,pady=10)
 
         #Create Oculus Rift Page
-        #TODO: Add radio buttons here for natural vision T/F
+        #TODO: Add radio buttons for retaining formatting and text box for custom pdb
         page = self.notebook.add('Rift Visualizer')
         group = Pmw.Group(page, tag_text = 'Oculus Rift Visualizer')
         group.pack(fill = 'both', expand = 1, padx = 10, pady = 5)
-        self.radiobuttons = Pmw.RadioSelect(group.interior(),buttontype = 'radiobutton',orient = 'vertical',labelpos = 'w',)
-        self.radiobuttons.add('Natural Rotation')
-        self.radiobuttons.add('Molecule Rotation')
-        self.radiobuttons.setvalue('Natural Rotation')
-        self.radiobuttons.pack(fill='x',padx=4,pady=1)
 
+        self.radiobuttons_rot = Pmw.RadioSelect(group.interior(),buttontype = 'radiobutton',orient = 'vertical',labelpos = 'w',)
+        self.radiobuttons_rot.add('Natural Rotation')
+        self.radiobuttons_rot.add('Molecule Rotation')
+        self.radiobuttons_rot.setvalue('Natural Rotation')
+        self.radiobuttons_rot.pack(fill='x',padx=4,pady=1)
+
+        self.radiobuttons_mol = Pmw.RadioSelect(group.interior(),buttontype = 'radiobutton',orient = 'vertical',labelpos = 'w',label_text = 'Edit Molecule?',)
+        self.radiobuttons_mol.add('Yes')
+        self.radiobuttons_mol.add('No')
+        self.radiobuttons_mol.setvalue('No')
+        self.radiobuttons_mol.pack(fill='x',padx=4,pady=1)
+
+        self.pdb_text = Pmw.EntryField(group.interior(),labelpos='w',label_text='Load PDB ID:',command=None,)
+        self.pdb_text.pack(fill='x', padx=4, pady=1)
 
         #Create Leap Motion Page
         page = self.notebook.add('Leap Mover')
@@ -101,13 +110,18 @@ class OcuMOLLeap:
             print 'You clicked on, ' + result
             if result == 'Run Rift Only':
                 # PyMOL will crash if Rift is off or not connected.
-                if self.radiobuttons.getvalue() == 'Natural Rotation':
-                    self.hmd = PymolHmd(naturalRotation=True)
-                    self.hmd.Run()
+                if self.radiobuttons_rot.getvalue() == 'Natural Rotation':
+                    if self.radiobuttons_mol.getvalue() == 'Yes':
+                        self.hmd = PymolHmd(naturalRotation=True,editMolecule=True,pdb=self.pdb_text.getvalue())
+                    else:
+                        self.hmd = PymolHmd(naturalRotation=True,editMolecule=False,pdb=self.pdb_text.getvalue())
                 else:
-                    self.hmd = PymolHmd(naturalRotation=False)
-                    self.hmd.Run()
+                    if self.radiobuttons_mol.getvalue() == 'Yes':
+                        self.hmd = PymolHmd(naturalRotation=False,editMolecule=True,pdb=self.pdb_text.getvalue())
+                    else:
+                        self.hmd = PymolHmd(naturalRotation=False,editMolecule=False,pdb=self.pdb_text.getvalue())
 
+                self.hmd.Run()
 
             elif result == 'Run Leap Only':
                 # Leap Motion needed for this... name convention is poor.
