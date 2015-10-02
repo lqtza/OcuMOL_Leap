@@ -84,20 +84,22 @@ class OcuMOLLeapPlugin:
         self.pdbText.pack(padx=1, pady=1)
 
         # Text to input stereo shift parameter, see wiki for more info
+        # TODO make this a slider
         self.stereoShiftText = Pmw.EntryField(riftGroup.interior(),
                                                 labelpos='w',
                                                 label_text='Stereo shift:',
-                                                value='5.24',
+                                                value='1.0',
                                                 validate = {'validator' : 'real'},
                                                 modifiedcommand=self.changed,)
 
         self.stereoShiftText.pack(padx=1, pady=1)
 
         # Text to input stereo angle parameter, see wiki for more info
+        # TODO make this a slider
         self.stereoAngleText = Pmw.EntryField(riftGroup.interior(),
                                                 labelpos='w',
                                                 label_text='Stereo angle:',
-                                                value='2.0',
+                                                value='1.0',
                                                 validate = {'validator' : 'real'},
                                                 modifiedcommand=self.changed,)
 
@@ -140,7 +142,6 @@ class OcuMOLLeapPlugin:
 
     def execute(self,result):
         if result:
-            print 'You clicked on, ' + result
             if result == 'Run Rift Only':
                 # PyMOL will crash if Rift is off or not connected.
                 if self.rotationRadio.getvalue() == 'Natural Rotation':
@@ -148,21 +149,27 @@ class OcuMOLLeapPlugin:
                         self.hmd = PymolHmd(naturalRotation=True,
                                             editMolecule=True,
                                             pdb=self.pdbText.getvalue())
+                        self.hmd.start() # this is an inherited class function
                     else:
                         self.hmd = PymolHmd(naturalRotation=True,
                                             editMolecule=False,
                                             pdb=self.pdbText.getvalue())
+                        self.hmd.start() # this is an inherited class function
                 else:
                     if self.moleculeRadio.getvalue() == 'Yes':
                         self.hmd = PymolHmd(naturalRotation=False,
                                             editMolecule=True,
                                             pdb=self.pdbText.getvalue())
+                        self.hmd.start() # this is an inherited class function
                     else:
                         self.hmd = PymolHmd(naturalRotation=False,
                                             editMolecule=False,
                                             pdb=self.pdbText.getvalue())
+                        self.hmd.start() # this is an inherited class function
 
-                self.hmd.Run()
+                # set initial stereo properties
+                #cmd.set('stereo_shift',self.stereoShiftText.getvalue())
+                #cmd.set('stereo_angle',self.stereoAngleText.getvalue())
 
             elif result == 'Run Leap Only':
                 # Leap Motion needed for this... name convention is poor.

@@ -11,17 +11,17 @@ from ocudump import Ocudump
 from ocumol.src.helper.transformations import euler_matrix
 
 class PymolHmd(threading.Thread):
-    
+
     def __init__(self, naturalRotation=True, pdb='', editMolecule=False):
 
         threading.Thread.__init__(self)
 
-        # load pdb into pymol and set up view 
+        # load pdb into pymol and set up view
         self.InitPymol(pdb,editMolecule=editMolecule)
 
         # define how view rotation is updated
         self.naturalRotation = naturalRotation
-        
+
         # initialize ocudump instance
         self.ocudump = Ocudump()
 
@@ -39,7 +39,7 @@ class PymolHmd(threading.Thread):
 
         # set scaling factor for rotation
         self.rotationScaling = 25
-    
+
     def InitPymol(self,pdb='',fullscreen=False,editMolecule=False):
         # load pdb
         if len(pdb) == 4:
@@ -50,54 +50,54 @@ class PymolHmd(threading.Thread):
             cmd.hide('everything','all')
             cmd.show('cartoon','all')
             util.cbc()
-        
+
         # move slab away to give a comfortable viewing area
         cmd.clip('move',10)
-        
+
         # set stereo mode
         cmd.set('stereo_mode',3)
         cmd.stereo()
-        
+
         # get rid of gui
         cmd.set('internal_gui',0)
-        
+
         # set resolution to HD for rift
         cmd.viewport(1920,1080)
-         
+
         # full screen?
         if fullscreen: cmd.full_screen('on')
 
         # set origin at camera
         self.SetOriginAtCamera()
-    
+
     def InitCamera(self):
 
         self.ocudump.getPose()
 
         # this makes the camera surprisingly jumpy at first
         # max, do we need it?
-        self.basePose = self.ocudump.pose
-    
+        # self.basePose = self.ocudump.pose
+
     def SetOriginAtCamera(self):
 
         view = np.array(cmd.get_view())
 
         # faster (?) version
         cmd.origin(position=view[12:15] - view[9:12].dot(view[0:9].reshape((3,3)).T))
-            
+
         # simple version
         #     rot = view[0:9].reshape((3,3))
         #     camera = view[9:12]
         #     model = view[12:15]
         #     cmd.origin(position=model - camera.dot(rot.T))
-        
+
 
     def Visualize(self):
 
         # again, do we need this function?
         self.InitCamera()
 
-        # listen ... 
+        # listen ...
         while True:
 
             # Rift support
@@ -110,12 +110,12 @@ class PymolHmd(threading.Thread):
             x_rot = pose[0] - self.previousPose[0]
             y_rot = pose[1] - self.previousPose[1]
             z_rot = pose[2] - self.previousPose[2]
-            
+
             # update view
             cmd.turn('x',x_rot*self.rotationScaling)
             cmd.turn('y',y_rot*self.rotationScaling)
             cmd.turn('z',z_rot*self.rotationScaling)
-            
+
             # rift head tracking
             if self.ocudump.positionTracked:
                 try:
@@ -130,15 +130,15 @@ class PymolHmd(threading.Thread):
             # update camera for "natural rotation"
             if self.naturalRotation:
                 # this breaks the code... not sure why
-                #self.SetOriginAtCamera()
+                self.SetOriginAtCamera()
                 pass
 
             # record previous pose for accurate rotation diff
-            self.previousPose = pose 
+            self.previousPose = pose
 
             time.sleep(1/float(self.trackingRefresh))
 
-    def Run(self):
+    def run(self):
         self.Visualize()
 
 if __name__ == '__main__':
