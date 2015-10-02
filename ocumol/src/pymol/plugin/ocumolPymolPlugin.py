@@ -31,7 +31,8 @@ class OcuMOLLeapPlugin:
         self.dialog = Pmw.Dialog(self.parent,
                                 buttons = ( "Run Rift Only",
                                             "Run Leap Only",
-                                            "Run Both" ),
+                                            "Run Both",
+                                            "About" ),
                                 title = 'OcuMOL Leap',
                                 command = self.execute)
 
@@ -39,82 +40,73 @@ class OcuMOLLeapPlugin:
 
         Pmw.setbusycursorattributes(self.dialog.component('hull'))
 
-        authorList = Tkinter.Label(self.dialog.interior(),
-                            text = """PyMOL Oculus Rift Viewer and Leap Motion Mover\n
-                                        Max Klein, Jeliazko Jeliazkov, Henry Lessen,
-                                        and Mariusz Matyszewski, 2015.\n
-                                        https://github.com/lqtza/OcuMOL_Leap""",
-                            background = 'black',
-                            foreground = 'white',
-                            #pady = 20,)
-
-        authoList.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
-
         self.notebook = Pmw.NoteBook(self.dialog.interior())
-        self.notebook.pack(fill='both',expand=1,padx=10,pady=10)
+        self.notebook.pack(fill='both',expand=1,padx=5,pady=5)
 
         # Create Oculus Rift Page
         page = self.notebook.add('Rift Visualizer')
-        group = Pmw.Group(page, tag_text = 'Oculus Rift Visualizer')
-        group.pack(fill = 'both', expand = 1, padx = 10, pady = 5)
+        riftGroup = Pmw.Group(page, tag_text = 'Oculus Rift Visualizer')
+        riftGroup.pack(fill = 'both', expand = 1, padx = 5, pady = 5)
 
         # Radio buttons to select for rotation method
-        self.rotationRadio = Pmw.RadioSelect(group.interior(),
-                                                buttontype = 'radiobutton',
-                                                orient = 'vertical',
-                                                labelpos = 'w',)
+        self.rotationRadio = Pmw.RadioSelect(riftGroup.interior(),
+                                                orient = 'horizontal',
+                                                labelpos = 'w',
+                                                label_text = 'Rotation Method:',
+                                                frame_relief = 'ridge',
+                                                frame_borderwidth = 2,)
 
         self.rotationRadio.add('Natural Rotation')
         self.rotationRadio.add('Molecule Rotation')
 
         self.rotationRadio.setvalue('Natural Rotation')
-        self.rotationRadio.pack(fill='x',padx=4,pady=1)
+        self.rotationRadio.pack(padx=1,pady=1)
 
         # Radio buttons to select for view editing at initialization
-        self.moleculeRadio = Pmw.RadioSelect(group.interior(),
-                                                buttontype = 'radiobutton',
-                                                orient = 'vertical',
+        self.moleculeRadio = Pmw.RadioSelect(riftGroup.interior(),
+                                                orient = 'horizontal',
                                                 labelpos = 'w',
-                                                label_text = 'Edit Molecule?',)
-
+                                                label_text = 'Edit View:',
+                                                frame_relief = 'ridge',
+                                                frame_borderwidth = 2,)
         self.moleculeRadio.add('Yes')
         self.moleculeRadio.add('No')
 
         self.moleculeRadio.setvalue('No')
-        self.moleculeRadio.pack(fill='x',padx=4,pady=1)
+        self.moleculeRadio.pack(padx=1,pady=1)
 
         # Text to input pdb id, for testing
-        self.pdbText = Pmw.EntryField(group.interior(),
+        self.pdbText = Pmw.EntryField(riftGroup.interior(),
                                         labelpos='w',
                                         label_text='Load PDB ID:',
                                         command=None,)
 
-        self.pdbText.pack(fill='x', padx=4, pady=1)
+        self.pdbText.pack(padx=1, pady=1)
 
         # Text to input stereo shift parameter, see wiki for more info
-        self.stereoShiftText = Pmw.EntryField(group.interior(),
+        self.stereoShiftText = Pmw.EntryField(riftGroup.interior(),
                                                 labelpos='w',
                                                 label_text='Stereo shift:',
                                                 value='5.24',
                                                 validate = {'validator' : 'real'},
                                                 modifiedcommand=self.changed,)
 
-        self.stereoShiftText.pack(fill='x', padx=4, pady=1)
+        self.stereoShiftText.pack(padx=1, pady=1)
 
         # Text to input stereo angle parameter, see wiki for more info
-        self.stereoAngleText = Pmw.EntryField(group.interior(),
+        self.stereoAngleText = Pmw.EntryField(riftGroup.interior(),
                                                 labelpos='w',
                                                 label_text='Stereo angle:',
                                                 value='2.0',
                                                 validate = {'validator' : 'real'},
                                                 modifiedcommand=self.changed,)
 
-        self.stereoAngleText.pack(fill='x', padx=4, pady=1)
+        self.stereoAngleText.pack(padx=1, pady=1)
 
         # Create Leap Motion Page
         page = self.notebook.add('Leap Mover')
         group = Pmw.Group(page, tag_text = 'Leap Motion Mover')
-        group.pack(fill = 'both', expand = 1, padx = 10, pady = 5)
+        group.pack(fill = 'both', expand = 1, padx = 5, pady = 5)
 
         self.leapOpt = Pmw.OptionMenu(group.interior(),
                                     labelpos = 'w',
@@ -122,22 +114,21 @@ class OcuMOLLeapPlugin:
                                     items = ('Move','Edit',),
                                     initialitem = 'Move',)
 
-        self.leapOpt.pack(fill='x',expand=1,padx=4,pady=1)
+        self.leapOpt.pack(padx=1,pady=1)
 
-        # Create About Page
-        page = self.notebook.add('About')
-        group = Pmw.Group(page, tag_text='About OcuMOL Leap')
-        group.pack(fill = 'both', expand = 1, padx = 10, pady = 5)
-
-        aboutText = """Magic text goes here."""
-        interiorFrame = Frame(group.interior())
-        bar = Scrollbar(interior_frame,)
-        textHolder = Text(interior_frame, yscrollcommand=bar.set,background='#ddddff',font="Times 14")
-        bar.config(command=text_holder.yview)
-        textHolder.insert(END,aboutText)
-        textHolder.pack(side=LEFT,expand="yes",fill="both")
-        bar.pack(side=LEFT,expand="yes",fill="y")
-        interiorFrame.pack(expand="yes",fill="both")
+        # Create About Pop-up
+        Pmw.aboutversion('1.0')
+        Pmw.aboutcopyright(
+        'Apache License\n' +
+        'Version 2.0, January 2004'
+        )
+        Pmw.aboutcontact(
+        'PyMOL Oculus Rift Viewer and Leap Motion Mover\n' +
+        'Max Klein, Jeliazko Jeliazkov, Henry Lessen, and Mariusz Matyszewski, 2015.\n' +
+        'https://github.com/lqtza/OcuMOL_Leap'
+        ) # note github link cannot be copied for some reason...
+        self.about = Pmw.AboutDialog(self.parent,applicationname="OcuMOL Leap")
+        self.about.withdraw()
 
         # create placeholders for listeners
         self.hmd=0
@@ -180,6 +171,8 @@ class OcuMOLLeapPlugin:
 
             elif result == 'Run Both':
                 print 'Inner if, should create a Viewer and Mover object.'
+            elif result == 'About':
+                self.about.show()
         else:
             self.quit()
 
