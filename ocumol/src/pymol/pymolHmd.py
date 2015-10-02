@@ -142,6 +142,7 @@ class PymolHmd(threading.Thread):
         self.Visualize()
 
 if __name__ == '__main__':
-    #do not run if imported as module
+    # do not run if imported as module
     pcls=PymolHmd()
-    pcls.Run()
+    # using the start command from the inherited thread class
+    pcls.start()
