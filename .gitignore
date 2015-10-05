@@ -14,3 +14,4 @@ leapConfig.py
 .project
 .pydevproject
 .settings
+.DS_Store

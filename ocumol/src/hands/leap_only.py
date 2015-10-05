@@ -21,8 +21,8 @@ class PymolListener(Leap.Listener):
 
         self.controller = Leap.Controller()
         self.controller.add_listener(self)
-	self.controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
-	#self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
+        self.controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
+        #self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
 
         self.circom=1
 
@@ -62,8 +62,8 @@ class PymolListener(Leap.Listener):
                 self.view_do_translation = True
 
     	    else:
-	        self.view_do_rotation = False
-	        self.view_do_translation = False
+	            self.view_do_rotation = False
+	            self.view_do_translation = False
 
         self.update_view(frame,self.view_do_rotation, self.view_do_translation)
         self.prev_frame = frame
@@ -96,22 +96,22 @@ class PymolListener(Leap.Listener):
         for gest in frame.gestures():
             if gest.type is Leap.Gesture.TYPE_CIRCLE:
                 circle=Leap.CircleGesture(gest)
-		if circle.progress>=1.5:# and len(frame.hands)==1:
+    	        if circle.progress>=1.5:# and len(frame.hands)==1:
                     self.circom=0
 
         if self.circom==0 and len(frame.gestures())==0:
             self.circom=1
-	    if len(frame.hands)==1:
+            if len(frame.hands)==1:
             	cmd.center("all",0,1)
-	    elif len(frame.hands)==2:
-		cmd.orient("all")
+            elif len(frame.hands)==2:
+                cmd.orient("all")
 
         if frame.hands.rightmost.rotation_probability(self.prev_frame) > 0.1 and do_rotation == True:
             #print 'rotating'
             rotation_about_x = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.x_axis)
             rotation_about_y = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.y_axis)
             rotation_about_z = frame.hands.rightmost.rotation_angle(self.prev_frame,Vector.z_axis)
-	    #print rotation_about_x, rotation_about_y, rotation_about_z
+            #print rotation_about_x, rotation_about_y, rotation_about_z
             cmd.rotate('x',rotation_about_x*100)
             cmd.rotate('y',rotation_about_y*100)
             cmd.rotate('z',rotation_about_z*100)
@@ -126,9 +126,9 @@ class PymolListener(Leap.Listener):
             translation = frame.hands.rightmost.translation(self.prev_frame)
             #print translation.to_float_array()
             cmd.translate(translation.to_float_array())
-	
-	#currently disabled
-	'''
+
+    #currently disabled
+    '''
         elif self.mode == 'edit' and len(frame.hands) == 1:
             if frame.hands[0].is_right:
                 translation = frame.hands[0].translation(self.prev_frame)
@@ -136,10 +136,10 @@ class PymolListener(Leap.Listener):
             elif frame.hands[0].is_left:
                 translation = frame.hands[0].translation(self.prev_frame)
                 cmd.translate(translation.to_float_array(),'EcFtsZ_AB.clean')
-	'''
+    '''
 
-	#experimental zoom function, undisable by removing quotes
-	'''
+    #experimental zoom function, undisable by removing quotes
+    '''
         view = list(cmd.get_view())
 
         if frame.scale_probability(self.prev_frame) > 0.9 and len(frame.hands)==1:
