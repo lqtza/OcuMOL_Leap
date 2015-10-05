@@ -3,10 +3,6 @@ import math
 import time
 from pymol import cmd
 import os
-# Point to Leap SDK
-# leap_path = os.path.join()
-# sys.path.append(os.environ["LEAPPATH"])
-# Import Leap
 import Leap
 from Leap import Matrix, Vector, CircleGesture
 
@@ -17,12 +13,11 @@ class PymolListener(Leap.Listener):
         self.prev_frame = None
         self.view_do_rotation = False
         self.view_do_translation = False
-        self.mode = 'view' #this should be binary edit or view
+        self.mode = 'view' # this should be binary edit or view
 
         self.controller = Leap.Controller()
         self.controller.add_listener(self)
-	self.controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
-	#self.controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
+        self.controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
 
         self.circom=1
 
@@ -30,9 +25,11 @@ class PymolListener(Leap.Listener):
         self.controller.remove_listener(self)
         super(PymolListener, self).__del__()
 
+    # inheriting from Leap.Listener and extending
     def on_init(self, controller):
         print "Initialized"
 
+    # inheriting from Leap.Listener and extending
     def on_connect(self, controller):
         print "Connected"
 
@@ -42,12 +39,15 @@ class PymolListener(Leap.Listener):
         self.controller.config.set("Gesture.Swipe.MinVelocity",500)
         self.controller.config.save()
 
+    # inheriting from Leap.Listener and extending
     def on_disconnect(self, controller):
         print "Disconnected"
 
+    # inheriting from Leap.Listener and extending
     def on_exit(self, controller):
         print "Exited"
 
+    # inheriting from Leap.Listener and extending
     def on_frame(self, controller):
         frame = controller.frame()
         #print self.view_do_rotation
@@ -62,17 +62,18 @@ class PymolListener(Leap.Listener):
                 self.view_do_translation = True
 
     	    else:
-	        self.view_do_rotation = False
-	        self.view_do_translation = False
+                self.view_do_rotation = False
+                self.view_do_translation = False
 
-        self.update_view(frame,self.view_do_rotation, self.view_do_translation)
+        self.update_view(frame, self.view_do_rotation, self.view_do_translation)
         self.prev_frame = frame
 
     def update_view(self, frame, do_rotation, do_translation):
         if not self.prev_frame:
             return
 
-        #check what mode to set, also make directional in future
+        # check what mode to set, also make directional in future
+        # switch modes, TODO: deprecate?
         if len(frame.hands) == 2:
             for gest in frame.gestures():
                 if gest.type is Leap.Gesture.TYPE_SWIPE:
@@ -80,31 +81,30 @@ class PymolListener(Leap.Listener):
                         time.sleep(0.3)
                         if self.mode == 'view':
                             self.mode = 'edit'
-			    cmd.bg_color("white")
+                            cmd.bg_color("white")
                         else:
                             self.mode = 'view'
-			    cmd.bg_color("black")
+                            cmd.bg_color("black")
                         do_rotation = False
                         do_translation = False
                         print 'Changing mode to: ' + self.mode
                         time.sleep(0.6)
-			break
-
-	'''if len(frame.gestures())>=1:
-	    print "point"'''
+                        break # why?
 
         for gest in frame.gestures():
             if gest.type is Leap.Gesture.TYPE_CIRCLE:
                 circle=Leap.CircleGesture(gest)
-		if math.floor(circle.progress)>=1:# and len(frame.hands)==1:
-                    self.circom=0
+
+		if math.floor(circle.progress)>=1:
+            self.circom=0
 
         if self.circom==0 and len(frame.gestures())==0:
             self.circom=1
+
 	    if len(frame.hands)==1:
-            	cmd.center("all")
+            cmd.center("all")
 	    elif len(frame.hands)==2:
-		cmd.orient("all")
+            cmd.orient("all")
 
         if frame.hands.rightmost.rotation_probability(self.prev_frame) > 0.1 and do_rotation == True:
             #print 'rotating'
@@ -145,19 +145,5 @@ class PymolListener(Leap.Listener):
             view[16] -= delta_z
 	    cmd.set_view(view)'''
 
-
-	'''#Rift support
-	self.rft.poll()
-	self.currf = self.rft.rotation
-	self.currf = tran.euler_from_quaternion([self.currf[3],self.currf[0],self.currf[1],self.currf[2]])
-
-	diff = [self.currf[0]-self.prevrf[0],self.currf[1]-self.prevrf[1],self.currf[2]-self.prevrf[2]]
-
-	cmd.turn('x',diff[0]*100)
-	cmd.turn('y',diff[1]*100)
-	cmd.turn('z',diff[2]*100)
-
-	self.prevrf = self.currf'''
-    
-# if __name__ == '__main__':
-#     listener = PymolListener()
+if __name__ == '__main__':
+    listener = PymolListener()

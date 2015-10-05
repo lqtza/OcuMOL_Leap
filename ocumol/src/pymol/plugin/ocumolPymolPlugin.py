@@ -12,7 +12,8 @@ import sys
 import os
 from pymol import cmd
 
-from ocumol.src.pymol.pymolHmd import PymolHmd#, PymolListener
+from ocumol.src.pymol.pymolHmd import PymolHmd
+from ocumol.src.hands.leap_only import PymolListener
 
 def __init__(self):
     """
@@ -168,16 +169,19 @@ class OcuMOLLeapPlugin:
                         self.hmd.start() # this is an inherited class function
 
                 # set initial stereo properties
-                #cmd.set('stereo_shift',self.stereoShiftText.getvalue())
-                #cmd.set('stereo_angle',self.stereoAngleText.getvalue())
+                cmd.set('stereo_shift',self.stereoShiftText.getvalue())
+                cmd.set('stereo_angle',self.stereoAngleText.getvalue())
+
+                # we've already run the rift, so let's run the hand support
+                # if that's what has been called for
+                if result == 'Run Both':
+                    self.hand = PymolListener()
 
             elif result == 'Run Leap Only':
                 # Leap Motion needed for this... name convention is poor.
                 # Currently doesn't work... exits on init.
                 self.hand = PymolListener()
 
-            elif result == 'Run Both':
-                print 'Inner if, should create a Viewer and Mover object.'
             elif result == 'About':
                 self.about.show()
         else:
