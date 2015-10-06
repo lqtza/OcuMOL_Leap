@@ -36,15 +36,26 @@ def RadioSingleClosure(obj, attrName, targetButtonName):
         if buttonName==targetButtonName:
             obj.__setattr__(attrName, True)
             if obj.running:
-                obj.InitPymol()
+                obj.initPymol()
+    return Callback
+
+def RotationClosure(obj):
+    def Callback(buttonName):
+        if buttonName=='Natural rotation':
+            obj.__setattr__('naturalRotation', True)
+        else:
+            obj.__setattr__('naturalRotation', False)
+            if obj.running:
+                obj.setOriginAtMolecule()
     return Callback
 
 def ValidatePDBClosure(obj):
     def ValidatePDB(txt):
         if len(txt)==4 and txt==re.match('[a-zA-Z0-9]*', txt).group(0):
-            obj.pdb = txt
             if obj.running:
-                obj.InitPymol()
+                obj.reinitPymol(pdb=txt)
+            else:
+                obj.pdb = txt
             return Pmw.OK
         else:
             return Pmw.PARTIAL
@@ -123,7 +134,7 @@ class OcuMOLLeapPlugin:
         # set up some callbacks
         DebugModeCallback = RadioMultipleClosure(self.hmd, {'Debug mode':'debugMode'})
         MoleculeCallback = RadioSingleClosure(self.hmd, 'editMolecule', 'Yes')
-        RotationCallback = RadioSingleClosure(self.hmd, 'naturalRotation', 'Natural rotation')
+        RotationCallback = RotationClosure(self.hmd)
         ValidatePDB = ValidatePDBClosure(self.hmd)
         
         # Create Oculus Rift Page
@@ -217,7 +228,6 @@ class OcuMOLLeapPlugin:
     def execute(self, result):
         if result:
             if result=='Run Rift Only':
-                print 'hoy\n'
                 # set initial stereo properties
                 cmd.set('stereo_shift',self.stereoShiftText.getvalue())
                 cmd.set('stereo_angle',self.stereoAngleText.getvalue())

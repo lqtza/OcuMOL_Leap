@@ -3,6 +3,7 @@ from pymol import util
 import time
 import numpy as np
 import os
+import re
 import threading
 
 pymolHmdScript = os.path.realpath(__file__)
@@ -62,36 +63,63 @@ class PymolHmd(threading.Thread):
         return self.ocudump.init()
     
     def initPymol(self):
-        # move slab away to give a comfortable viewing area
-        cmd.clip('move',10)
 
         # set stereo mode
-        cmd.set('stereo_mode',3)
+        cmd.set('stereo_mode', 3)
         cmd.stereo()
 
         # get rid of gui
-        cmd.set('internal_gui',0)
+        cmd.set('internal_gui', 0)
 
         # set resolution to HD for rift
-        cmd.viewport(1920,1080)
+        cmd.viewport(1920, 1080);
 
         # full screen?
         if self.fullscreen: 
             cmd.full_screen('on')
 
         # load pdb
-        if len(self.pdb) == 4:
-            cmd.fetch(self.pdb,async=0)
+        if len(self.pdb)==4 and self.pdb==re.match('[a-zA-Z0-9]*', self.pdb).group(0):
+            cmd.fetch(self.pdb, async=0)
+        
+        cmd.hide('everything', 'all')
+        cmd.show('cartoon', 'all')
         
         # color each chain differently
         if self.editMolecule:
-            cmd.hide('everything','all')
-            cmd.show('cartoon','all')
             util.cbc()
-
+        
         # set origin at camera
-        self.setOriginAtCamera()
-
+        if self.naturalRotation:
+            self.setOriginAtCamera()
+    
+        # move slab away to give a comfortable viewing area
+        cmd.clip('move', 10)
+        
+        # jiggle the camera to deal with blank screen error
+        cmd.move('z', .0001)
+    
+    def reinitPymol(self, pdb):
+        if len(self.pdb)==4 and self.pdb==re.match('[a-zA-Z0-9]*', self.pdb).group(0):
+            cmd.delete(self.pdb)
+        if len(pdb)==4 and pdb==re.match('[a-zA-Z0-9]*', pdb).group(0):
+            self.pdb = pdb
+            cmd.fetch(self.pdb, async=0)
+        
+        cmd.hide('everything', 'all')
+        cmd.show('cartoon', 'all')
+        
+        # color each chain differently
+        if self.editMolecule:
+            util.cbc()
+        
+        # set origin at camera
+        if self.naturalRotation:
+            self.setOriginAtCamera()
+        
+        # move slab away to give a comfortable viewing area
+        cmd.clip('move', 10)
+        
     def setOriginAtCamera(self):
         view = np.array(cmd.get_view())
 
@@ -104,7 +132,10 @@ class PymolHmd(threading.Thread):
         #     model = view[12:15]
         #     cmd.origin(position=model - camera.dot(rot.T))
 
-
+    def setOriginAtMolecule(self):
+        view = np.array(cmd.get_view())
+        cmd.origin(position=view[9:12])
+    
     def visualize(self):
         # load pdb into pymol and set up view
         self.initPymol()
