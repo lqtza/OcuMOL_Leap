@@ -61,9 +61,9 @@ class PymolListener(Leap.Listener):
             elif len(frame.hands) == 2 and frame.hands.leftmost.sphere_radius < 40:
                 self.view_do_translation = True
 
-    	    else:
-	            self.view_do_rotation = False
-	            self.view_do_translation = False
+            else:
+                self.view_do_rotation = False
+                self.view_do_translation = False
 
         self.update_view(frame,self.view_do_rotation, self.view_do_translation)
         self.prev_frame = frame
@@ -73,36 +73,35 @@ class PymolListener(Leap.Listener):
             return
 
         #check what mode to set, also make directional in future
-	#currently disabled, does not match rest of the program
-	'''
-        if len(frame.hands) == 2:
-            for gest in frame.gestures():
-                if gest.type is Leap.Gesture.TYPE_SWIPE:
-                    if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds > 0.15:
-                        time.sleep(0.3)
-                        if self.mode == 'view':
-                            self.mode = 'edit'
-			    cmd.bg_color("white")
-                        else:
-                            self.mode = 'view'
-			    cmd.bg_color("black")
-                        do_rotation = False
-                        do_translation = False
-                        print 'Changing mode to: ' + self.mode
-                        time.sleep(0.6)
-			break
-	'''
+    #currently disabled, does not match rest of the program
+
+#         if len(frame.hands) == 2:
+#             for gest in frame.gestures():
+#                 if gest.type is Leap.Gesture.TYPE_SWIPE:
+#                     if Leap.SwipeGesture(gest).direction.y > 0.5 and gest.duration_seconds > 0.15:
+#                         time.sleep(0.3)
+#                         if self.mode == 'view':
+#                             self.mode = 'edit'
+#                 cmd.bg_color("white")
+#                         else:
+#                             self.mode = 'view'
+#                 cmd.bg_color("black")
+#                         do_rotation = False
+#                         do_translation = False
+#                         print 'Changing mode to: ' + self.mode
+#                         time.sleep(0.6)
+#             break
 
         for gest in frame.gestures():
             if gest.type is Leap.Gesture.TYPE_CIRCLE:
                 circle=Leap.CircleGesture(gest)
-    	        if circle.progress>=1.5:# and len(frame.hands)==1:
+                if circle.progress>=1.5:# and len(frame.hands)==1:
                     self.circom=0
 
         if self.circom==0 and len(frame.gestures())==0:
             self.circom=1
             if len(frame.hands)==1:
-            	cmd.center("all",0,1)
+                cmd.center("all",0,1)
             elif len(frame.hands)==2:
                 cmd.orient("all")
 
@@ -148,8 +147,8 @@ class PymolListener(Leap.Listener):
             view[11] += delta_z
             view[15] -= delta_z
             view[16] -= delta_z
-	    cmd.set_view(view)
-	'''
+        cmd.set_view(view)
+    '''
 
 # if __name__ == '__main__':
 #     listener = PymolListener()

@@ -66,7 +66,7 @@ class CustomSetupCommand:
             f.write("leapPath = '%s'" % os.path.join(leapSDKDir, 'lib'))
          
     def _writePymolrc(self):
-        pymolrcPath = os.path.expanduser('~/.pymolrc')
+        pymolrcPath = os.path.expanduser('~/.pymolrc.py')
         ocumolStartBumper = '#'*4 + 'START_OCUMOL_PLUGIN' + '#'*4
         ocumolEndBumper = '#'*4 + 'END_OCUMOL_PLUGIN' + '#'*4
         with open(os.path.join(thisScriptDir, 'pymolrc'), 'r') as f:
