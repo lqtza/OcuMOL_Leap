@@ -1,18 +1,23 @@
-from pymol import cmd
-from pymol import util
-import time
 import numpy as np
 import os
 import re
+import time
 import threading
+import warnings
+
+from pymol import cmd
+from pymol import util
 
 pymolHmdScript = os.path.realpath(__file__)
 
 from ocudump import Ocudump, OcudumpDebug
 from ocumol.src.helper.transformations import euler_matrix
 
+# suppresses the incredibly unhelpful warning when running cmd.viewport
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 class PymolHmd(threading.Thread):
-    poseCoordDict = {'xrot':0, 'yrot':1, 'zrot':2, 
+    poseCoordDict = {'xRot':0, 'yRot':1, 'zRot':2, 
                      'x':3, 'y':4, 'z':5}
     
     def __init__(self, debugMode=False, editMolecule=False, naturalRotation=True, pdb=''):
@@ -43,8 +48,8 @@ class PymolHmd(threading.Thread):
         # user options
         self.pdb = pdb  # pdb to load, if any
     
-    def initAnimateElem(self, poseCoordName, minim, maxim, period):
-        self.ocudumpDebug.initAnimateElem(self.poseCoordDict[poseCoordName], minim, maxim, period)
+    def initAnimateElement(self, poseCoordName, minim, maxim, period):
+        self.ocudumpDebug.initAnimateElement(self.poseCoordDict[poseCoordName], minim, maxim, period)
     
     def initCamera(self):
         self.ocudump.getPose()
@@ -167,7 +172,7 @@ class PymolHmd(threading.Thread):
                 cmd.move('x', pose[3] - self.previousPosition[0])
                 cmd.move('y', pose[4] - self.previousPosition[1])
                 cmd.move('z', pose[5] - self.previousPosition[2])
-
+            
             # update camera for "natural rotation"
             if self.naturalRotation:
                 self.setOriginAtCamera()

@@ -62,18 +62,36 @@ def ValidatePDBClosure(obj):
             return Pmw.PARTIAL
     return ValidatePDB
 
+def AnimateElemInnerLoop(pluginObj, poseCoordName):
+    args = [poseCoordName]
+    for argN in pluginObj.animateElemColumnStrings:
+        key = '%s_%s' % (poseCoordName, argN)
+        if pluginObj.animateElemFields[key].getvalue()=='':
+            return False
+        convFunc = int if argN=='period' else float
+        val = convFunc(pluginObj.animateElemFields[key].getvalue())
+        args.append(val)
+    pluginObj.hmd.initAnimateElement(*args)
+    return True
+    
 def AnimateElemClosure(argName, pluginObj):
-    def AnimateElemSubclosure(poseCoord):
+    def AnimateElemSubclosure(poseCoordName):
         def AnimateElemValidateFloat(txt):
+            if txt=='':
+                return Pmw.OK
             try:
                 locale.atof(txt)
+                AnimateElemInnerLoop(pluginObj, poseCoordName)
                 return Pmw.OK
             except ValueError:
                 return Pmw.PARTIAL
             
         def AnimateElemValidateInt(txt):
+            if txt=='':
+                return Pmw.OK
             try:
                 locale.atoi(txt)
+                AnimateElemInnerLoop(pluginObj, poseCoordName)
                 return Pmw.OK
             except ValueError:
                 return Pmw.PARTIAL
@@ -253,7 +271,7 @@ class OcuMOLLeapPlugin:
             columnLabels[i] = Tkinter.Label(frame, text=self.animateElemColumnStrings[i])
             columnLabels[i].grid(column=i+1, row=0, sticky='nw')
         
-        self.animateElemRowStrings = ['xrot', 'yrot', 'zrot', 'x', 'y', 'z']
+        self.animateElemRowStrings = ['xRot', 'yRot', 'zRot', 'x', 'y', 'z']
         rowLabels = {}
         for i in range(6):
             rowLabels[i] = Tkinter.Label(frame, text=self.animateElemRowStrings[i])
@@ -267,13 +285,17 @@ class OcuMOLLeapPlugin:
         for i,rs in enumerate(self.animateElemRowStrings):
             for j,cs in enumerate(self.animateElemColumnStrings):
                 key = '%s_%s' % (rs, cs)
-                val = '0' if cs=='period' else '0.0'
-                AnimateElemValidate = animateElemClosures[cs](poseCoord=i)
+                AnimateElemValidate = animateElemClosures[cs](poseCoordName=rs)
                 self.animateElemFields[key] = Pmw.EntryField(frame,
-                                                             value=val,
                                                              validate=AnimateElemValidate)
                 self.animateElemFields[key].grid(column=j+1, row=i+1, stick='nw')
                 
+            # all of the fields in a given row must exist before validation can work, so we defer setting values until here
+            for cs in self.animateElemColumnStrings:
+                key = '%s_%s' % (rs, cs)
+                val = '1' if cs=='period' else '0.0'
+                self.animateElemFields[key].setentry(val)
+
         # for some reason, pmw checkbuttons don't work with grid :(
 #         buttons = {}
 #         for i in range(6):
@@ -289,8 +311,8 @@ class OcuMOLLeapPlugin:
         if result:
             if result=='Run Rift Only':
                 # set initial stereo properties
-                cmd.set('stereo_shift',self.stereoShiftText.getvalue())
-                cmd.set('stereo_angle',self.stereoAngleText.getvalue())
+                cmd.set('stereo_shift', self.stereoShiftText.getvalue())
+                cmd.set('stereo_angle', self.stereoAngleText.getvalue())
                 
                 self.hmd.start()
                 
