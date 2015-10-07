@@ -265,17 +265,20 @@ class OcuMOLLeapPlugin:
         frame = Tkinter.Frame(riftDebugGroup.interior())
         frame.pack(fill='both', expand=1)
         
+        animateLabel = Tkinter.Label(frame, text='Debug animation controls:')
+        animateLabel.grid(column=0, row=0, sticky='nw')
+        
         self.animateElemColumnStrings = ['min', 'max', 'period']
         columnLabels = {}
         for i in range(3):
             columnLabels[i] = Tkinter.Label(frame, text=self.animateElemColumnStrings[i])
-            columnLabels[i].grid(column=i+1, row=0, sticky='nw')
+            columnLabels[i].grid(column=i+1, row=1, sticky='nw')
         
         self.animateElemRowStrings = ['xRot', 'yRot', 'zRot', 'x', 'y', 'z']
         rowLabels = {}
         for i in range(6):
             rowLabels[i] = Tkinter.Label(frame, text=self.animateElemRowStrings[i])
-            rowLabels[i].grid(column=0, row=i+1, sticky='nw')
+            rowLabels[i].grid(column=0, row=i+2, sticky='nw')
             
         animateElemClosures = {'min':AnimateElemClosure(argName='min', pluginObj=self),
                                'max':AnimateElemClosure(argName='max', pluginObj=self),
@@ -288,7 +291,7 @@ class OcuMOLLeapPlugin:
                 AnimateElemValidate = animateElemClosures[cs](poseCoordName=rs)
                 self.animateElemFields[key] = Pmw.EntryField(frame,
                                                              validate=AnimateElemValidate)
-                self.animateElemFields[key].grid(column=j+1, row=i+1, stick='nw')
+                self.animateElemFields[key].grid(column=j+1, row=i+2, stick='nw')
                 
             # all of the fields in a given row must exist before validation can work, so we defer setting values until here
             for cs in self.animateElemColumnStrings:
@@ -303,8 +306,27 @@ class OcuMOLLeapPlugin:
 #                                       buttontype='checkbutton',
 #                                       orient='horizontal')
 #             buttons[i].grid(column=3, row=i, sticky='w')
-    
-        frame.grid_rowconfigure(6, weight=1)
+        
+        animateExplanation = ['You can use the above panel to set independent ',
+                              'animations on each of the 6 degrees of freedom ',
+                              'OcuMol reads from the Rift.\n\n',
+                              'min: sets the low end of the range of the ',
+                              'animation.\n',
+                              'max: sets the high end of the range of the ',
+                              'animation.\n',
+                              '(note: min & max have units of radians for the ',
+                              'rotations, and standard PyMol unit for the ',
+                              'translations)\n',
+                              'period: sets the time it takes the animation to ',
+                              'cycle from min to max and back again.\n',
+                              '(note: period is measured in terms of count of ',
+                              'tracking refreshes, which currently defaults to ',
+                              'a rate of %d per second)\n' % self.hmd.trackingRefresh]
+        animateExplanation = ''.join(animateExplanation)
+        animateExplanationLabel = Tkinter.Label(frame, justify=Tkinter.LEFT, text=animateExplanation, wraplength=500)
+        animateExplanationLabel.grid(column=0, row=8, columnspan=4, sticky='nw')
+        
+        frame.grid_rowconfigure(8, weight=1)
         frame.grid_columnconfigure(3, weight=1)
         
     def execute(self, result):
