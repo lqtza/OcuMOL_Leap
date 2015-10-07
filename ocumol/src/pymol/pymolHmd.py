@@ -12,41 +12,39 @@ from ocudump import Ocudump, OcudumpDebug
 from ocumol.src.helper.transformations import euler_matrix
 
 class PymolHmd(threading.Thread):
+    poseCoordDict = {'xrot':0, 'yrot':1, 'zrot':2, 
+                     'x':3, 'y':4, 'z':5}
+    
     def __init__(self, debugMode=False, editMolecule=False, naturalRotation=True, pdb=''):
+        # set up the Thread stuff
         threading.Thread.__init__(self)
         
-        # flag that indicates if the instance is in active control of a pymol session
-        self.running = False
+        # pre-initialize the ocudumpDebug, in case we want to set animations
+        self.ocudumpDebug = OcudumpDebug()
         
-        # flag that indicates if we should run in debug mode (indifferent to presence of Rift)
-        self.debugMode = debugMode
+        # initialize previousOrientation (pitch, yaw, roll) and previousPostion (x, y, z)
+        self.previousOrientation = [0,0,0]
+        self.previousPosition = [0,0,0]
         
-        # pdb to load, if any
-        self.pdb = pdb
+        # internal flags
+        self.fullscreen = False # whether to run in fullscreen mode or not
+        self.running = False    # indicates if this instance's run method has been called
         
-        # set pymol editing mode on/off
-        self.editMolecule = editMolecule
-
-        # define how view rotation is updated
-        self.naturalRotation = naturalRotation
+        # internal options
+        self.rotationScaling = 25   # set scaling factor for rotation
+        self.trackingRefresh = 30   # oculus tracking data refresh rate, in Hz
+        self.translationScaling = 1 # set scaling factor for translation
         
-        # whether to run in fullscreen mode or not
-        self.fullscreen = False
-
-        # set previous head pitch, yaw, roll
-        self.previousPose = [0,0,0]
-
-        # set previous head x,y,z
-        self.previousXYZ = [0,0,0]
-
-        # oculus tracking data refresh rate, in Hz
-        self.trackingRefresh = 30
-
-        # set scaling factor for translation
-        self.translationScaling = 1
-
-        # set scaling factor for rotation
-        self.rotationScaling = 25
+        # user flags
+        self.debugMode = debugMode              # should we run in debug mode (ie indifferent to presence of Rift)?
+        self.editMolecule = editMolecule        # set pymol editing mode on/off
+        self.naturalRotation = naturalRotation  # define how view rotation is updated
+        
+        # user options
+        self.pdb = pdb  # pdb to load, if any
+    
+    def initAnimateElem(self, poseCoordName, minim, maxim, period):
+        self.ocudumpDebug.initAnimateElem(self.poseCoordDict[poseCoordName], minim, maxim, period)
     
     def initCamera(self):
         self.ocudump.getPose()
@@ -57,7 +55,7 @@ class PymolHmd(threading.Thread):
     
     def initOcudump(self):
         if self.debugMode:
-            self.ocudump = OcudumpDebug()
+            self.ocudump = self.ocudumpDebug
         else:
             self.ocudump = Ocudump()
         return self.ocudump.init()
@@ -134,18 +132,18 @@ class PymolHmd(threading.Thread):
 
     def setOriginAtMolecule(self):
         view = np.array(cmd.get_view())
+        # TODO: replace this with something that sets the origin at the center of mass
         cmd.origin(position=view[9:12])
     
     def visualize(self):
         # load pdb into pymol and set up view
         self.initPymol()
         
-        # again, do we need this function?
+        # TODO: check if this is necessary
         self.initCamera()
         
         # listen ...
         while True:
-
             # Rift support
             self.ocudump.getPose()
 
@@ -153,34 +151,29 @@ class PymolHmd(threading.Thread):
             pose = self.ocudump.pose
 
             # calculate head rotation
-            x_rot = pose[0] - self.previousPose[0]
-            y_rot = pose[1] - self.previousPose[1]
-            z_rot = pose[2] - self.previousPose[2]
+            xRot = pose[0] - self.previousOrientation[0]
+            yRot = pose[1] - self.previousOrientation[1]
+            zRot = pose[2] - self.previousOrientation[2]
 
             # update view
-            cmd.turn('x',x_rot*self.rotationScaling)
-            cmd.turn('y',y_rot*self.rotationScaling)
-            cmd.turn('z',z_rot*self.rotationScaling)
+            cmd.turn('x', xRot*self.rotationScaling)
+            cmd.turn('y', yRot*self.rotationScaling)
+            cmd.turn('z', zRot*self.rotationScaling)
 
             # rift head tracking
             if self.ocudump.positionTracked:
-                try:
-                    # move head if sensor detects head motion
-                    # not tested
-                    cmd.move('x', pose[4] - self.prev_xyz[4])
-                    cmd.move('y', pose[5] - self.prev_xyz[5])
-                    cmd.move('z', pose[6] - self.prev_xyz[6])
-                except AttributeError:
-                    self.prev_xzy = pose[3:6]
+                # move head if sensor detects head motion
+                # not tested
+                cmd.move('x', pose[3] - self.previousPosition[0])
+                cmd.move('y', pose[4] - self.previousPosition[1])
+                cmd.move('z', pose[5] - self.previousPosition[2])
 
             # update camera for "natural rotation"
             if self.naturalRotation:
-                # this breaks the code... not sure why
                 self.setOriginAtCamera()
-                pass
 
             # record previous pose for accurate rotation diff
-            self.previousPose = pose
+            self.previousOrientation = pose[0:3]
 
             time.sleep(1/float(self.trackingRefresh))
 

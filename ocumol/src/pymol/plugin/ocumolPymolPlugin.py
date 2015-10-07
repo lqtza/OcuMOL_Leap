@@ -2,18 +2,19 @@
     An OcuMOL Leap plugin for PyMOL. To install go to the Plugin menu in PyMOL
     and under the Install New Plugin tab click Choose file... and select this file.
 """
+import locale
 import os, sys
 import Pmw
 import re
 import Tkinter
 from Tkinter import *
-import urllib2
 
 import pymol
 from pymol import cmd
 
-from ocumol.src.pymol.pymolHmd import PymolHmd
+from ocumol.src.helper.helper import PrintException
 from ocumol.src.hands.leap_only import PymolListener
+from ocumol.src.pymol.pymolHmd import PymolHmd
 
 def __init__(self):
     """
@@ -61,29 +62,56 @@ def ValidatePDBClosure(obj):
             return Pmw.PARTIAL
     return ValidatePDB
 
+def AnimateElemClosure(argName, pluginObj):
+    def AnimateElemSubclosure(poseCoord):
+        def AnimateElemValidateFloat(txt):
+            try:
+                locale.atof(txt)
+                return Pmw.OK
+            except ValueError:
+                return Pmw.PARTIAL
+            
+        def AnimateElemValidateInt(txt):
+            try:
+                locale.atoi(txt)
+                return Pmw.OK
+            except ValueError:
+                return Pmw.PARTIAL
+            
+        if argName=='period':
+            return AnimateElemValidateInt
+        else:
+            return AnimateElemValidateFloat
+    return AnimateElemSubclosure
+
 ### OcuMOLLeap code ###
 class OcuMOLLeapPlugin:
     def __init__(self, app):
-        self.app = app
-        
-        # create placeholders for listeners
-        self.hand=0
-        
-        # set up hmd and callbacks
-        self.hmd = PymolHmd()
-        
-        # initialize the main ocumol megawidget
-        self.initNotebook()
-
-        # initialize the subwidgets
-        self.initRiftPage()
-        self.initLeapPage()
-        self.initRiftDebugPage()
-        self.initAboutPopup()
-        
-        # finish up the initialization of the main megawidget
-        self.initNotebookFinalize()
+        # the t_e block here ensures that we actually get an error message when stuff goes wrong
+        try:
+            self.app = app
+            
+            # create placeholders for listeners
+            self.hand=0
+            
+            # set up hmd and callbacks
+            self.hmd = PymolHmd()
+            
+            # initialize the main ocumol megawidget
+            self.initNotebook()
     
+            # initialize the subwidgets
+            self.initRiftPage()
+            self.initLeapPage()
+            self.initRiftDebugPage()
+            self.initAboutPopup()
+            
+            # finish up the initialization of the main megawidget
+            self.initNotebookFinalize()
+            
+        except:
+            PrintException()
+            
     def initAboutPopup(self):
         # Create About Pop-up
         Pmw.aboutversion('1.0')
@@ -155,7 +183,7 @@ class OcuMOLLeapPlugin:
         self.rotationRadio.add('Molecule rotation')
 
         self.rotationRadio.setvalue('Natural rotation')
-        self.rotationRadio.pack(padx=1,pady=1)
+        self.rotationRadio.pack(padx=1, pady=1)
 
         # Radio buttons to select for view editing at initialization
         self.moleculeRadio = Pmw.RadioSelect(riftGroup.interior(),
@@ -208,23 +236,55 @@ class OcuMOLLeapPlugin:
                                               label_text='',
                                               orient='horizontal')
         self.debugModeCheck.add('Debug mode')
-
-#         self.moleculeRadio.setvalue('Debug mode')
         self.debugModeCheck.pack(padx=1,pady=1)
-
+        
     def initRiftDebugPage(self):
         # Create Rift Debug Page
         riftDebugPage = self.notebook.add('Rift Debug')
         riftDebugGroup = Pmw.Group(riftDebugPage, tag_text='Rift Debug')
         riftDebugGroup.pack(fill='both', expand=1, padx=5, pady=5)
-
-#         self.stereoAngleText = Pmw.EntryField(riftGroup.interior(),
-#                                               labelpos='w',
-#                                               label_text='Stereo angle:',
-#                                               modifiedcommand=self.changed,
-#                                               value='1.0',
-#                                               validate={'validator' : 'real'})
-
+        
+        frame = Tkinter.Frame(riftDebugGroup.interior())
+        frame.pack(fill='both', expand=1)
+        
+        self.animateElemColumnStrings = ['min', 'max', 'period']
+        columnLabels = {}
+        for i in range(3):
+            columnLabels[i] = Tkinter.Label(frame, text=self.animateElemColumnStrings[i])
+            columnLabels[i].grid(column=i+1, row=0, sticky='nw')
+        
+        self.animateElemRowStrings = ['xrot', 'yrot', 'zrot', 'x', 'y', 'z']
+        rowLabels = {}
+        for i in range(6):
+            rowLabels[i] = Tkinter.Label(frame, text=self.animateElemRowStrings[i])
+            rowLabels[i].grid(column=0, row=i+1, sticky='nw')
+            
+        animateElemClosures = {'min':AnimateElemClosure(argName='min', pluginObj=self),
+                               'max':AnimateElemClosure(argName='max', pluginObj=self),
+                               'period':AnimateElemClosure(argName='period', pluginObj=self)}
+        
+        self.animateElemFields = {}
+        for i,rs in enumerate(self.animateElemRowStrings):
+            for j,cs in enumerate(self.animateElemColumnStrings):
+                key = '%s_%s' % (rs, cs)
+                val = '0' if cs=='period' else '0.0'
+                AnimateElemValidate = animateElemClosures[cs](poseCoord=i)
+                self.animateElemFields[key] = Pmw.EntryField(frame,
+                                                             value=val,
+                                                             validate=AnimateElemValidate)
+                self.animateElemFields[key].grid(column=j+1, row=i+1, stick='nw')
+                
+        # for some reason, pmw checkbuttons don't work with grid :(
+#         buttons = {}
+#         for i in range(6):
+#             buttons = Pmw.RadioSelect(frame,
+#                                       buttontype='checkbutton',
+#                                       orient='horizontal')
+#             buttons[i].grid(column=3, row=i, sticky='w')
+    
+        frame.grid_rowconfigure(6, weight=1)
+        frame.grid_columnconfigure(3, weight=1)
+        
     def execute(self, result):
         if result:
             if result=='Run Rift Only':
