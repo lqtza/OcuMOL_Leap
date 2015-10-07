@@ -23,6 +23,7 @@ Incorporating the Oculus Rift and Leap Motion into PyMOL.
 - Clone this repository (OcuMOL_Leap), and `cd` to it.
 - Run `LEAPSDK_DIR=<path-to-your-leapSDK> pip install -e .`
   - Be sure to replace `<path-to-your-leapSDK>` with the actual path to *your* copy of the Leap SDK.
+  - If you are running with the `sudo` command, you can pass environment variables by `-E` (at least on OS X), so you would run: `LEAPSDK_DIR=<path-to-your-leapSDK> sudo -E pip install -e .`
   - The above command will get `pip` to install OcuMol in development mode, meaning that it will create a kind of soft link between your python module directory and the OcuMol directory.
   - Eventually OcuMol will also be available directly through pypi.
 - The OcuMol plugin should now be available from the `Plugin` menu the next time you start PyMol.
