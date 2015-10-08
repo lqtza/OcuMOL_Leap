@@ -140,7 +140,7 @@ class PymolHmd(threading.Thread):
     def setOriginAtMolecule(self):
         view = np.array(cmd.get_view())
         #cmd.origin(position=view[9:12])
-        cmd.origin(position=getMoleculeCoM())
+        cmd.origin(position=self.getMoleculeCoM())
 
     def getMoleculeCoM(self):
         # "stupid" COM func that gets the com of all atoms
