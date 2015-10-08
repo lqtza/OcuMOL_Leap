@@ -25,43 +25,6 @@ def __init__(self):
                              command = lambda s=self: OcuMOLLeapPlugin(s),
                              label='OcuMOL Leap',)
 
-def RadioMultipleClosure(obj, buttonAttrNameDict):
-    def Callback(buttonName, val):
-        obj.__setattr__(buttonAttrNameDict[buttonName], val)
-#         if obj.running:
-#             obj.InitPymol()
-    return Callback
-
-def RadioSingleClosure(obj, attrName, targetButtonName):
-    def Callback(buttonName):
-        if buttonName==targetButtonName:
-            obj.__setattr__(attrName, True)
-            if obj.running:
-                obj.initPymol()
-    return Callback
-
-def RotationClosure(obj):
-    def Callback(buttonName):
-        if buttonName=='Natural rotation':
-            obj.__setattr__('naturalRotation', True)
-        else:
-            obj.__setattr__('naturalRotation', False)
-            if obj.running:
-                obj.setOriginAtMolecule()
-    return Callback
-
-def ValidatePDBClosure(obj):
-    def ValidatePDB(txt):
-        if len(txt)==4 and txt==re.match('[a-zA-Z0-9]*', txt).group(0):
-            if obj.running:
-                obj.reinitPymol(pdb=txt)
-            else:
-                obj.pdb = txt
-            return Pmw.OK
-        else:
-            return Pmw.PARTIAL
-    return ValidatePDB
-
 def AnimateElemInnerLoop(pluginObj, poseCoordName):
     args = [poseCoordName]
     for argN in pluginObj.animateElemColumnStrings:
@@ -102,6 +65,57 @@ def AnimateElemClosure(argName, pluginObj):
             return AnimateElemValidateFloat
     return AnimateElemSubclosure
 
+def DebugClosure(hmdObj, pluginObj):
+    def Callback(buttonName, val):
+        try:
+            hmdObj.__setattr__('debugMode', val)
+            if val==True:
+                if 'Rift Debug' not in pluginObj.notebook.pagenames():
+                    pluginObj.initRiftDebugPage()
+            else:
+                if 'Rift Debug' in pluginObj.notebook.pagenames():
+                    pluginObj.delRiftDebugPage()
+        except:
+            PrintException()
+    return Callback
+
+def RadioMultipleClosure(obj, buttonAttrNameDict):
+    def Callback(buttonName, val):
+        obj.__setattr__(buttonAttrNameDict[buttonName], val)
+#         if obj.running:
+#             obj.InitPymol()
+    return Callback
+
+def RadioSingleClosure(obj, attrName, targetButtonName):
+    def Callback(buttonName):
+        if buttonName==targetButtonName:
+            obj.__setattr__(attrName, True)
+            if obj.running:
+                obj.initPymol()
+    return Callback
+
+def RotationClosure(obj):
+    def Callback(buttonName):
+        if buttonName=='Natural rotation':
+            obj.__setattr__('naturalRotation', True)
+        else:
+            obj.__setattr__('naturalRotation', False)
+            if obj.running:
+                obj.setOriginAtMolecule()
+    return Callback
+
+def ValidatePDBClosure(obj):
+    def ValidatePDB(txt):
+        if len(txt)==4 and txt==re.match('[a-zA-Z0-9]*', txt).group(0):
+            if obj.running:
+                obj.reinitPymol(pdb=txt)
+            else:
+                obj.pdb = txt
+            return Pmw.OK
+        else:
+            return Pmw.PARTIAL
+    return ValidatePDB
+
 ### OcuMOLLeap code ###
 class OcuMOLLeapPlugin:
     def __init__(self, app):
@@ -120,7 +134,6 @@ class OcuMOLLeapPlugin:
 
             # initialize the subwidgets
             self.initRiftPage()
-            self.initRiftDebugPage()
             self.initLeapPage()
             self.initAboutPopup()
 
@@ -173,19 +186,25 @@ class OcuMOLLeapPlugin:
 
     def initNotebookFinalize(self):
         # finish setting up the notebook (which is the main ocumol megawidget)
+        # temporarily init the Rift Debug page so the widget starts up at the right size
+        self.initRiftDebugPage()
+        
         self.notebook.setnaturalsize()
         self.dialog.show()
-
+        
+        # remove the Rift Debug page until the user selects debug mode
+        self.delRiftDebugPage()
+        
     def initRiftPage(self):
         # set up some callbacks
-        DebugModeCallback = RadioMultipleClosure(self.hmd, {'Debug mode':'debugMode'})
+        DebugModeCallback = DebugClosure(self.hmd, self)
         MoleculeCallback = RadioSingleClosure(self.hmd, 'editMolecule', 'Yes')
         RotationCallback = RotationClosure(self.hmd)
         ValidatePDB = ValidatePDBClosure(self.hmd)
 
         # Create Oculus Rift Page
-        page = self.notebook.add('Rift Visualizer')
-        riftGroup = Pmw.Group(page, tag_text='Oculus Rift Visualizer')
+        riftPage = self.notebook.add('Rift Visualizer')
+        riftGroup = Pmw.Group(riftPage, tag_text='Oculus Rift Visualizer')
         riftGroup.pack(fill='both', expand=1, padx=5, pady=5)
 
         # Radio buttons to select for rotation method
@@ -258,7 +277,7 @@ class OcuMOLLeapPlugin:
 
     def initRiftDebugPage(self):
         # Create Rift Debug Page
-        riftDebugPage = self.notebook.add('Rift Debug')
+        riftDebugPage = self.notebook.insert('Rift Debug', before='Leap Mover')
         riftDebugGroup = Pmw.Group(riftDebugPage, tag_text='Rift Debug')
         riftDebugGroup.pack(fill='both', expand=1, padx=5, pady=5)
 
@@ -336,6 +355,14 @@ class OcuMOLLeapPlugin:
         frame.grid_rowconfigure(8, weight=1)
         frame.grid_columnconfigure(3, weight=1)
 
+    def changed(self):
+        # change stereo settings
+        cmd.set('stereo_shift',self.stereoShiftText.getvalue())
+        cmd.set('stereo_angle',self.stereoAngleText.getvalue())
+
+    def delRiftDebugPage(self):
+        self.notebook.delete('Rift Debug')
+
     def execute(self, result):
         if result:
             if result=='Run Rift Only':
@@ -360,10 +387,7 @@ class OcuMOLLeapPlugin:
         else:
             self.quit()
 
-    def changed(self):
-        # change stereo settings
-        cmd.set('stereo_shift',self.stereoShiftText.getvalue())
-        cmd.set('stereo_angle',self.stereoAngleText.getvalue())
+
 
     def quit(self):
         self.dialog.destroy()
