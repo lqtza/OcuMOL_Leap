@@ -73,7 +73,7 @@ def AnimateElemInnerLoop(pluginObj, poseCoordName):
         args.append(val)
     pluginObj.hmd.initAnimateElement(*args)
     return True
-    
+
 def AnimateElemClosure(argName, pluginObj):
     def AnimateElemSubclosure(poseCoordName):
         def AnimateElemValidateFloat(txt):
@@ -85,7 +85,7 @@ def AnimateElemClosure(argName, pluginObj):
                 return Pmw.OK
             except ValueError:
                 return Pmw.PARTIAL
-            
+
         def AnimateElemValidateInt(txt):
             if txt=='':
                 return Pmw.OK
@@ -95,7 +95,7 @@ def AnimateElemClosure(argName, pluginObj):
                 return Pmw.OK
             except ValueError:
                 return Pmw.PARTIAL
-            
+
         if argName=='period':
             return AnimateElemValidateInt
         else:
@@ -108,28 +108,28 @@ class OcuMOLLeapPlugin:
         # the t_e block here ensures that we actually get an error message when stuff goes wrong
         try:
             self.app = app
-            
+
             # create placeholders for listeners
             self.hand=0
-            
+
             # set up hmd and callbacks
             self.hmd = PymolHmd()
-            
+
             # initialize the main ocumol megawidget
             self.initNotebook()
-    
+
             # initialize the subwidgets
             self.initRiftPage()
-            self.initLeapPage()
             self.initRiftDebugPage()
+            self.initLeapPage()
             self.initAboutPopup()
-            
+
             # finish up the initialization of the main megawidget
             self.initNotebookFinalize()
-            
+
         except:
             PrintException()
-            
+
     def initAboutPopup(self):
         # Create About Pop-up
         Pmw.aboutversion('1.0')
@@ -142,7 +142,7 @@ class OcuMOLLeapPlugin:
             'https://github.com/lqtza/OcuMOL_Leap') # note github link cannot be copied for some reason...
         self.about = Pmw.AboutDialog(self.parent,applicationname="OcuMOL Leap")
         self.about.withdraw()
-    
+
     def initLeapPage(self):
         # Create Leap Motion Page
         page = self.notebook.add('Leap Mover')
@@ -155,7 +155,7 @@ class OcuMOLLeapPlugin:
                                       labelpos='w',
                                       label_text='Mover Mode')
         self.leapOpt.pack(padx=1,pady=1)
-    
+
     def initNotebook(self):
         # set up the main ocumol megawidget (which is a notebook)
         self.parent = self.app.root
@@ -170,19 +170,19 @@ class OcuMOLLeapPlugin:
         Pmw.setbusycursorattributes(self.dialog.component('hull'))
         self.notebook = Pmw.NoteBook(self.dialog.interior())
         self.notebook.pack(fill='both', expand=1, padx=5, pady=5)
-    
+
     def initNotebookFinalize(self):
         # finish setting up the notebook (which is the main ocumol megawidget)
         self.notebook.setnaturalsize()
         self.dialog.show()
-    
+
     def initRiftPage(self):
         # set up some callbacks
         DebugModeCallback = RadioMultipleClosure(self.hmd, {'Debug mode':'debugMode'})
         MoleculeCallback = RadioSingleClosure(self.hmd, 'editMolecule', 'Yes')
         RotationCallback = RotationClosure(self.hmd)
         ValidatePDB = ValidatePDBClosure(self.hmd)
-        
+
         # Create Oculus Rift Page
         page = self.notebook.add('Rift Visualizer')
         riftGroup = Pmw.Group(page, tag_text='Oculus Rift Visualizer')
@@ -243,7 +243,7 @@ class OcuMOLLeapPlugin:
                                               value='1.0',
                                               validate={'validator' : 'real'})
         self.stereoAngleText.pack(padx=1, pady=1)
-        
+
         # Check button to run the HMD in debug mode, which will keep going even if the Rift is not attached/detected
         self.debugModeCheck = Pmw.RadioSelect(riftGroup.interior(),
                                               buttontype='checkbutton',
@@ -255,19 +255,18 @@ class OcuMOLLeapPlugin:
                                               orient='horizontal')
         self.debugModeCheck.add('Debug mode')
         self.debugModeCheck.pack(padx=1,pady=1)
-        
+
     def initRiftDebugPage(self):
         # Create Rift Debug Page
         riftDebugPage = self.notebook.add('Rift Debug')
         riftDebugGroup = Pmw.Group(riftDebugPage, tag_text='Rift Debug')
         riftDebugGroup.pack(fill='both', expand=1, padx=5, pady=5)
-        
+
         labelFrame = Tkinter.Frame(riftDebugGroup.interior())
         labelFrame.pack(fill='both', expand=1)
         
         animateLabel = Tkinter.Label(labelFrame, text='Debug animation controls:')
         animateLabel.grid(column=0, row=0, sticky='nw')
-#         animateLabel.pack(pady=1)
         
         labelFrame.grid_rowconfigure(0, weight=1)
         labelFrame.grid_columnconfigure(0, weight=1)
@@ -280,17 +279,17 @@ class OcuMOLLeapPlugin:
         for i in range(3):
             columnLabels[i] = Tkinter.Label(frame, text=self.animateElemColumnStrings[i])
             columnLabels[i].grid(column=i+1, row=1, sticky='nw')
-        
+
         self.animateElemRowStrings = ['xRot', 'yRot', 'zRot', 'x', 'y', 'z']
         rowLabels = {}
         for i in range(6):
             rowLabels[i] = Tkinter.Label(frame, text=self.animateElemRowStrings[i])
             rowLabels[i].grid(column=0, row=i+2, sticky='nw')
-            
+
         animateElemClosures = {'min':AnimateElemClosure(argName='min', pluginObj=self),
                                'max':AnimateElemClosure(argName='max', pluginObj=self),
                                'period':AnimateElemClosure(argName='period', pluginObj=self)}
-        
+
         self.animateElemFields = {}
         for i,rs in enumerate(self.animateElemRowStrings):
             for j,cs in enumerate(self.animateElemColumnStrings):
@@ -299,7 +298,7 @@ class OcuMOLLeapPlugin:
                 self.animateElemFields[key] = Pmw.EntryField(frame,
                                                              validate=AnimateElemValidate)
                 self.animateElemFields[key].grid(column=j+1, row=i+2, stick='nw')
-                
+
             # all of the fields in a given row must exist before validation can work, so we defer setting values until here
             for cs in self.animateElemColumnStrings:
                 key = '%s_%s' % (rs, cs)
@@ -313,7 +312,7 @@ class OcuMOLLeapPlugin:
 #                                       buttontype='checkbutton',
 #                                       orient='horizontal')
 #             buttons[i].grid(column=3, row=i, sticky='w')
-        
+
         animateExplanation = ['You can use the above panel to set independent ',
                               'animations on each of the 6 degrees of freedom ',
                               'OcuMol reads from the Rift.\n\n',
@@ -330,21 +329,22 @@ class OcuMOLLeapPlugin:
                               'tracking refreshes, which currently defaults to ',
                               'a rate of %d per second)\n' % self.hmd.trackingRefresh]
         animateExplanation = ''.join(animateExplanation)
+
         animateExplanationLabel = Tkinter.Label(frame, justify=Tkinter.LEFT, text=animateExplanation, wraplength=400)
         animateExplanationLabel.grid(column=1, row=8, columnspan=3, sticky='nw')
-        
+
         frame.grid_rowconfigure(8, weight=1)
         frame.grid_columnconfigure(3, weight=1)
-        
+
     def execute(self, result):
         if result:
             if result=='Run Rift Only':
                 # set initial stereo properties
                 cmd.set('stereo_shift', self.stereoShiftText.getvalue())
                 cmd.set('stereo_angle', self.stereoAngleText.getvalue())
-                
+
                 self.hmd.start()
-                
+
                 # we've already run the rift, so let's run the hand support
                 # if that's what has been called for
                 if result=='Run Both':
