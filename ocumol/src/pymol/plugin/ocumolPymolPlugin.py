@@ -262,11 +262,18 @@ class OcuMOLLeapPlugin:
         riftDebugGroup = Pmw.Group(riftDebugPage, tag_text='Rift Debug')
         riftDebugGroup.pack(fill='both', expand=1, padx=5, pady=5)
         
+        labelFrame = Tkinter.Frame(riftDebugGroup.interior())
+        labelFrame.pack(fill='both', expand=1)
+        
+        animateLabel = Tkinter.Label(labelFrame, text='Debug animation controls:')
+        animateLabel.grid(column=0, row=0, sticky='nw')
+#         animateLabel.pack(pady=1)
+        
+        labelFrame.grid_rowconfigure(0, weight=1)
+        labelFrame.grid_columnconfigure(0, weight=1)
+        
         frame = Tkinter.Frame(riftDebugGroup.interior())
         frame.pack(fill='both', expand=1)
-        
-        animateLabel = Tkinter.Label(frame, text='Debug animation controls:')
-        animateLabel.grid(column=0, row=0, sticky='nw')
         
         self.animateElemColumnStrings = ['min', 'max', 'period']
         columnLabels = {}
@@ -314,17 +321,17 @@ class OcuMOLLeapPlugin:
                               'animation.\n',
                               'max: sets the high end of the range of the ',
                               'animation.\n',
+                              'period: sets the time it takes the animation to ',
+                              'cycle.\n\n',
                               '(note: min & max have units of radians for the ',
                               'rotations, and standard PyMol unit for the ',
                               'translations)\n',
-                              'period: sets the time it takes the animation to ',
-                              'cycle from min to max and back again.\n',
                               '(note: period is measured in terms of count of ',
                               'tracking refreshes, which currently defaults to ',
                               'a rate of %d per second)\n' % self.hmd.trackingRefresh]
         animateExplanation = ''.join(animateExplanation)
-        animateExplanationLabel = Tkinter.Label(frame, justify=Tkinter.LEFT, text=animateExplanation, wraplength=500)
-        animateExplanationLabel.grid(column=0, row=8, columnspan=4, sticky='nw')
+        animateExplanationLabel = Tkinter.Label(frame, justify=Tkinter.LEFT, text=animateExplanation, wraplength=400)
+        animateExplanationLabel.grid(column=1, row=8, columnspan=3, sticky='nw')
         
         frame.grid_rowconfigure(8, weight=1)
         frame.grid_columnconfigure(3, weight=1)
