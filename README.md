@@ -27,9 +27,7 @@ Incorporating the Oculus Rift and Leap Motion into PyMOL.
   - The above command will get `pip` to install OcuMol in development mode, meaning that it will create a kind of soft link between your python module directory and the OcuMol directory.
   - Eventually OcuMol will also be available directly through pypi.
 - The OcuMol plugin should now be available from the `Plugin` menu the next time you start PyMol.
-  - OcuMol tells PyMol where to look for the plugin by modifying your `~/.pymolrc` PyMol config file (or creating it if doesn't exist). 
-
-**Note: The Python script will crash if the Oculus Rift is not connected.**
+  - OcuMol tells PyMol where to look for the plugin by modifying your `~/.pymolrc.py` PyMol config file (or creating it if doesn't exist). 
 
 ## Oculus Rift and Leap Motion
 This will be coming soon. There's some issues to iron out.
